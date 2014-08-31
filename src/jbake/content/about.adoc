@@ -1,0 +1,11 @@
+= miki.org.pl
+Mikołaj Koziarkiewicz
+2014-08-31
+:jbake-type: page
+:jbake-status: published
+
+Hi there! This is the personal page of Mikołaj Koziarkiewicz (i.e. myself). It currently serves two purposes:
+
+* as an additional verification point for those wanting to use 
+http://search.maven.org/#search|ga|1|g%3A%22pl.org.miki%22[the Maven artifacts I've created on the `pl.org.miki` namespace],
+* as an excuse to start a blog (since I already have a domain and everything...).

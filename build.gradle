@@ -1,0 +1,47 @@
+buildscript {
+	configurations {
+		antScp
+	}
+	
+	repositories {
+		mavenCentral()
+		jcenter()
+	}
+
+	dependencies {
+		classpath 'me.champeau.gradle:jbake-gradle-plugin:0.2'
+		classpath 'org.asciidoctor:asciidoctor-java-integration:0.1.4'
+	}
+}
+
+apply plugin: 'me.champeau.jbake'
+
+task publish(dependsOn: jbake) {
+	
+	//TODO: obviously something about Gradle 2.0 config I don't understand
+	repositories {
+		mavenCentral()
+	}
+	
+	dependencies {
+		antScp 'com.jcraft:jsch:0.1.50','org.apache.ant:ant-jsch:1.9.3'
+	}
+	
+	ant.taskdef(
+		name: 'scp',
+		classname: 'org.apache.tools.ant.taskdefs.optional.ssh.Scp',
+		classpath: configurations.antScp.asPath)
+	
+	//TODO: find a generalized way to accessing either the CLI or IDE console
+	def console = System.console()
+	String host = "miki.org.pl"
+
+	String user = console.readLine("\nUser: ")
+	def password = console.readPassword("Password: ")
+	int port = Integer.valueOf(console.readLine("Port: "))
+	String uploadPath = console.readLine("Path: ")
+
+	ant.scp(todir: "$user:$password@$host:$uploadPath", port: port, trust: true) {
+		fileset(dir: 'build/jbake') { include(name: '**') }
+	}
+}

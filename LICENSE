@@ -1,0 +1,6 @@
+Build scripts in files ending with the .gradle extension are in the public domain.
+
+All supporting code and assets (JBake templates, Bootstrap, etc.) preserve their existing licenses.
+
+All content under ./src/jbake/content licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License.
+Full text at: http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode .

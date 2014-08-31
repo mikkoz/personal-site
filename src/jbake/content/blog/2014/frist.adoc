@@ -1,0 +1,13 @@
+= Frist post
+Mikołaj Koziarkiewicz
+2014-08-31
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: blog, general
+:idprefix:
+
+Time for an inaugural post. Regarding the present and future contents, there's more info on the http://miki.org.pl/about.html[About page].
+
+As you maybe noticed by the header, this page is generated with http://www.jbake.org[JBake]. It's also taking advantage of
+the JBake Gradle plugin by Cédric Champeau, https://melix.github.io/blog/2014/02/hosting-jbake-github.html[introduced here] 
+(incidentally also reminding me to add a http://creativecommons.org[Creative Commons] license declaration).
