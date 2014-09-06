@@ -1,0 +1,11 @@
+= Comments added
+Mikołaj Koziarkiewicz
+2014-09-06
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: blog, general
+:idprefix:
+
+Against my better judgment I have added commenting functionality to the site. 
+Hopefully there won't be much spam - went with http://intensedebate.com[IntenseDebate] for
+this reason. It supposedly provides better built-in spam-fighting capability.
