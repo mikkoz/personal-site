@@ -1,0 +1,124 @@
+= On _The Clean Coder_
+Mikołaj Koziarkiewicz
+2015-09-10
+:jbake-type: post
+:jbake-status: draft
+:jbake-tags: blog, general, berks
+:experimental:
+:idprefix:
+:link_cleanCode: http://www.pearsonhighered.com/educator/product/Clean-Code-A-Handbook-of-Agile-Software-Craftsmanship/9780132350884.page[Clean Code]
+:link_theCleanCoder: http://www.pearsonhighered.com/educator/product/Clean-Coder-The-A-Code-of-Conduct-for-Professional-Programmers/9780137081073.page[The Clean Coder] 
+
+== The Setting
+
+I've noticed conference speakers started to badger the audience more and more about the modern classics
+of software engineering: _{link_cleanCode}_, _The Pragmatic Programmer_, _Code Complete_, etc.
+
+Since this year's IT book summer sales were especially bountiful in opportunity
+footnote:[Yes, such a thing exists - are you really surprised?],
+I've decided to correct this long-standing knowledge deficiency and _buy all the books_.
+
+I'm currently starting _Code Complete_, but what I wanted to talk about is _{link_theCleanCoder}_. Note the _r_ - this is 
+actually a followup to _{link_cleanCode}_, i.e. a distinct book.
+
+Where _{link_cleanCode}_ focuses on the meat of your software engineering job, _{link_theCleanCoder}_ concentrates on 
+everything around it, specifically forming an answer to the question: "What does it mean to be a professional programmer?".
+
+Now, Robert C. "Uncle Bob" Martin is generally well-known in the programming community for his insightful and spot-on 
+opinions, so instead of providing yet another full-on review, I'll focus on one thing in the book that struck me 
+as potentially, well... harmful.
+
+One of the "professional" qualifiers that Uncle Bob defined is this: as a professional, _you, and you alone_ 
+are ultimately responsible for your professional growth. This qualifier, in general, is completely valid to the point
+of indisputability.
+
+== The Problem
+
+Unfortunately, it's also originally presented with the subtlety of going sloth-hunting in a Churchill AVRE.
+
+image::{jbake_url_illustrations}sloth.jpg[float="left", link="https://en.wikipedia.org/wiki/Sloth#mediaviewer/File:Bradypus.jpg", height="400", width="300"]
+image::{jbake_url_illustrations}churchillAvre.jpg[link="https://en.wikipedia.org/wiki/Armoured_Vehicle_Royal_Engineers#mediaviewer/File:290mm_Petard_with_ammunition.jpg"]
+
+The above statement is best illustrated by the following quote:
+
+"Professional programmers practice on their own time. It is not your employer’s
+job to help you keep your skills sharp for you. It is not your employer’s job to
+help you keep your resume tuned. Patients do not pay doctors to practice sutures.
+Football fans do not (usually) pay to see players run through tires. Concert-goers
+do not pay to hear musicians play scales. And employers of programmers don’t
+have to pay you for your practice time."
+-- Robert C. Martin, The Clean Coder: A Code of Conduct for Professional Programmers
+
+
+Let's start with the details:
+
+* yes, doctors *get paid* for practicing stitches, as Uncle Bob already points out, it's called "residence",
+* yes, team sport players *get paid* for practicing before a match, they have a regular salary,
+* yes, musicians *get paid* for practice - granted, not all of them, but the ones hired by an establishment such 
+as an philharmonic orchestra do.
+
+But that's just nitpicking - the biggest gripe of mine here is that the standard work of a programmer is compared to a 
+_performance_. Uncle Bob himself stresses that overtime is bad and that the typical workload should oscilate at around
+40 hours a week. But:
+
+* doctors *don't* normally operate 40 continuous hours a week,
+* team sport players *don't* normally have 40 continuous hours worth of matches per week,
+* musicians *don't* normally play 40 continuous hours of concerts per week 
+footnote:[Short research indicates that the reasonable minimum is several concerts _per month_. In fairness, 
+the salaries tend to be bad enough to often necessitate taking on additional work.].
+
+In fact, in two-thirds of those jobs, the "practice" part is completely integrated into day-to-day work 
+footnote:[Even if not explicitly paid-for, still counts as "work".]. 
+Why expect something different from programmers then?
+
+Now, here's the twist - it doesn't appear that that's what Uncle Bob means at all, and it is simply a case of a misasdjusted
+analogy. The problem is it becomes apparent only late in the book.
+
+In the final chapter, Mr. Martin talks at length about mentoring - not only self-mentoring, but also explictly _training
+newcomers to be set in the path of professionalism and software craftsmanship_.
+
+Then it becomes apparent that we're not talking about practice in general. Rather, here's what the proposed rule appears to
+be:
+
+* while your _personal_ development in the context of your _chosen career path_ is solely in your hands,
+* any research, prototyping, training that's _pertinent to the job_ does not automatically become "personal development".
+
+So yeah, that's mostly clear. My only worry is that we now have an ammunition stockpile for irresponsible managers and 
+the relic "cowboy" programmers who might use it to say:
+
+"A prototype? A spike for that technology _[that is relevant to solving the problem, but we haven't used it yet]_? That's
+personal development, do it in your own time!"
+
+Utter BS, I know, but my heart bleeds for any junior programmers who would have to weather it, or rather, wade through it.
+
+== The Conclusion
+
+However, it has to be stressed: *both _{link_cleanCode}_ and _{link_theCleanCoder}_
+are absolutely brilliant books and a must-read for any professional programmer*. 
+
+A very cool thing is Uncle Bob working very hard at not pretending he's some messiah descending from on high, fully 
+formed as a software craftsman. He virtually makes a _point_ of showcasing the mistakes he made during his career,
+which both serves as case studies to learn from, and as a humanizing "hook" to the principles he's promoting.
+
+One particular example that caught my attention was with the misguided fascination on UML-based CASE tools during the 90s 
+(and implicitly early 00s). Boy, was I glad to hear I was in good company drinking that particular Kool-Aid...
+
+Both books are written in an ultra-accessible style that makes them perfect to read anywhere 
+without loss of comprehension footnote:[and effectively emulates the coding style espoused in _Clean Code_ in writing.], so 
+there's really no excuse to hold it off because "you don't have time to focus".
+
+With these books, there's no need to focus. As presented in this blog entry, you do need to critically digest 
+ what they say footnote:[The author says as much, multiple times.], but background-process-style thinking 
+should be a second nature if you're a programmer, right?
+
+== A Footnote
+
+A professional cares for his toolset. For coders, the toolset is his/hers total sum of knowledge and skills, and it's true
+that it *is the coder's responsibility*, ultimately, to take good care of them.
+
+However, for a professional leader (manager, company owner etc.) the toolset are the people he/she leads. It is, therefore,
+completely reasonable for said leader to display the same amount of care as the professional coder does - which implies
+acknowledging the need for job-relevant skill development.
+
+I'd argue that's what missing from _The Clean Coder_ is this interaction aspect - it's not enough to maintain a work ethic,
+you also have to be responsible for choosing your battles.
