@@ -1,4 +1,4 @@
-= miki.org.pl
+= mikołak.net
 Mikołaj Koziarkiewicz
 2014-08-31
 :jbake-type: page
