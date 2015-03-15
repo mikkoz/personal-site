@@ -34,7 +34,7 @@ task publish(dependsOn: jbake) << {
 	
 	//TODO: find a generalized way to accessing either the CLI or IDE console
 	def console = System.console()
-	String host = "mikołak.net"
+	String host = "xn--mikoak-6db.net"
 
 	String user = console.readLine("\nUser: ")
 	def password = console.readPassword("Password: ")
