@@ -1,0 +1,156 @@
+= Musings on Ansible
+Mikołaj Koziarkiewicz
+2015-04-09
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: blog, general, ansible, orchestration, configuration
+:experimental:
+:idprefix:
+
+This is a set of loosely-related remarks and observations, accrued due to recent use of Ansible in several work and
+personal projects (and on the latter note, https://github.com/mikolak-net/ansible-raspi-config[I made a thing]).
+
+The entry is mostly intended as a writing exercise, so if you're evaluating Ansible at the moment, please keep this
+in mind.
+
+== A word of Introduction
+
+http://www.ansible.com/home[Ansible], like
+https://www.chef.io/[Chef],
+https://puppetlabs.com/[Puppet] and
+http://saltstack.com/[Salt], is https://en.wikipedia.org/wiki/Configuration_management#Operating_System_configuration_management[configuration management]
+software. Despite my best intentions to reach the widest audience possible, providing a comprehensive overview of the
+field would require creating a whole series of blog posts.
+
+
+Therefore, wanting to convey the following statements in reasonable time, I'm forced to limit the
+target readership to those that posses basic knowledge of the subject. In other words, if you are unfamiliar with the subject,
+please do take your time to browse the included links. Sorry!
+
+== Ansible - the good, the bad, the ugly
+
+=== Context
+
+All those remarks are made by someone who is strictly more a dev than an op, so the things I'm writing about here may
+or may not apply to your situation as much as they did to mine.
+
+Also, the entry was writen when going through the https://en.wikipedia.org/wiki/Hype_cycle#/media/File:Gartner_Hype_Cycle.svg[Through of Disillusionment],
+halfway to the Slope Enlightenment, and therefore may sound more negative than intended.
+
+=== Good: Workerless setup
+
+The absolutely wonderful thing about Ansible is its agentless architecture - you don't need to setup anything on the
+services machines, other than a valid SSH connection to a user (usually with possible `sudo` access). No special nodes
+requiring additional setup (like in Chef), nothing of the sort.
+
+This in fact makes it very convenient to bootstrap setups for CI and the like, or even a quasi Inversion-of-Control setup,
+using the http://docs.ansible.com/playbooks_intro.html#ansible-pull[`ansible-pull` utility].
+
+Such a feature may seem like a small thing, but it reduces the error rate during the "metagame" of setting
+up your servers.
+
+=== Good: Easy to understand syntax
+
+Ansible uses YAML with embedded http://jinja.pocoo.org/docs/[Jinja2] for its configuration definitions, and
+most of the basic stuff can be expressed that way. Getting the majority of desirable output defined is pretty straightforward,
+once you learn the basics.
+
+=== Bad: ...that's sometimes not as intuitive as it should be
+
+A big stumbling block I've encountered is correctly specifying the conditions in `when` blocks (saying when to execute
+a task) and similar ones. Truth be told, even after viewing the parsing source code for the "playbooks", I'm
+ still not entirely confident on what is and isn't allowed.
+
+I think this is due to the fact that the Jinja2-based syntax sits pretty squarely in the
+ https://en.wikipedia.org/wiki/Uncanny_valley[Uncanny Valley] for someone with an off-and-on Python background. In
+ effect, you end up writing those conditions like in Python, which works... about 90% of the time. The remaining 10%
+ will piss you off to no end.footnote:[Of course, for someone working primary in Python, this may not be a problem,
+ due to their probable contact with and prior use of Jinja2.]
+
+=== Good: Has a strong focus on idempotency
+
+Pretty much a given for all modern configuration management software, but nevertheless I could excitedly rave and
+rant about that at you the entire day - it's *awesome* that Ansible specifically focuses on what the *state should be*,
+rather than what tasks to do.
+
+=== Good: Trivial to customize
+
+To recap, here's how config management works in Ansible:
+
+ - the unit of work is a _task_, meant to encapsulate a single "end-state" quantum, i.e. something that should be ensured
+ to be fulfilled once this _task_ is done.
+ - tasks use _modules_, which do the actual grunt work and can be implemented in most languages (a lot of them use Python,
+ obviously since Ansible is written in that). There exists a cornucopia of Ansible built-in modules, from user
+  management through ensuring a given is in a file, to EC2 instance setup.
+ - tasks can be grouped into _roles_, which can also contain common variables, custom modules etc..
+ - task and role mixes are codified into _playbooks_, which describes what your actual configuration should look like.
+ You "run" the playbooks on your "inventory"footnote:[A list of target servers with some labelling and variables.]
+ to achieve that desired state.
+
+.Creating roles
+****
+By the way, if you've dug through the role documentation and wondered how to create the role scaffolding automatically,
+here's how you can do that:
+
+     ansible-galaxy init <rolename>
+
+This is of course mentioned only in the Ansible Galaxy documentation, later on.
+****
+
+
+You'll notice that such a structure allows you to modularize your configuration management logic as you see fit. That
+includes creating several "internal" modules for complex actions and sticking them into your
+roles.footnote:[Normally, modules are quite a "big thing", able to be shared stand-alone, but sometimes the convenience
+ of writing in an actual Turing-complete programming language is too great to miss.]
+
+=== Bad: ...but no code reuse for Python modules
+
+Funilly enough, due to how Ansible is structured,
+http://stackoverflow.com/questions/15816952/can-a-developed-ansible-module-include-or-extend-an-ansible-core-module[you cannot have "common" code files for Python-based modules].
+
+That sucks, but is probably an edge case for most stuff.
+
+=== Good: Good introductory documentation
+
+The http://docs.ansible.com/intro.html[docs] footnote:[...which admittedly took a nearly-non-trivial amount of time for me to fish out
+ out of the sales-pitch-filled landing page....] do a very nice job of showing you the ropes. They are very much example-based,
+ and subsequent steps build upon previous knowledge in a logical way.
+
+=== Ugly: ...with no formal sections
+
+I fail to see, in the documentation, a "Big Picture" overview of how the various components of an Ansible definition are
+structured.
+
+Apparently, looking at the the latest http://stackoverflow.com/research/developer-survey-2015#profile-education[Stack Overflow poll],
+I'm in the minority when it comes to education and this may skew my perception, but  I would give my right spleen for
+an https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form[EBNF] or similarly-formatted formal specification of the Playbook syntax.
+
+=== Good: A globally shared role repository
+
+Ansible has something called https://galaxy.ansible.com/[Ansible Galaxy], which is its way to share you common configuration
+functionality.footnote:[If you've never used configuration management software, think of it as the equivalent of the Docker
+Hub Repository.]. It's pretty easy to use if you just want to find something (the thing I made is https://galaxy.ansible.com/list#/roles/3348[also there]).
+
+=== Ugly: ...very nascent in the current state
+
+However, especially if you display perfectionist tendencies footnote:[like Yours Truly], you will spend quite a bit of time examining the roles
+for the functionality your require.
+
+One problem is that, while a rating system exists, it's severely underused, and you have to fish for the well-made roles.
+
+Another is the presence of very clearly clashing philosophies when designing roles. It's best demonstrated when comparing
+ansible roles from https://github.com/geerlingguy[Jeff Geerling] and the https://github.com/Stouts[Stouts group].
+
+The former offer a definitely correctly functioning role, but make a metric f-ton of assumption about what a given piece
+of setup software is going to operate as. The latter, meanwhile, while not being entirely correct idempotency-wise, allow
+for very diverse configuration variants.
+
+To be honest, I came to prefer the Stouts roles for their ability to set up as *I* want them over the `geerlingguy` ones,
+despite Mr. Geerling's https://leanpub.com/ansible-for-devops[foray into book writing on Ansiblefootnote:[Can't comment on the book's quality, but the roles show good craftsmanship.]].
+
+== Overall
+
+The general picture that I've painted hopefully shows a framework with a number of nits that you can pick, but built
+on solid foundations nevertheless. Those solid foundations will provide a payoff as the framework grows and matures,
+eliminating the smaller problems along the away. Be aware of the shortcomings, but rest assured that I recommend you check
+out Ansible for you configuration management needs.
