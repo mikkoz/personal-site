@@ -1,0 +1,404 @@
+= Spaced-Repetition-assisted durable learning of technical concepts with Freemind and Anki
+Mikołaj Koziarkiewicz
+2015-05-28
+:jbake-type: post
+:jbake-status: draft
+:jbake-tags: blog, general, anki, spaced repetition, freemind, learning
+:experimental:
+:idprefix:
+:imagesdir: {jbake_url_illustrations}/anki/
+:caption:
+
+== Intro
+
+Have you ever:
+
+- regretted that you only remember some bare trivia from a course or a book that you studied several months ago? Or
+ maybe even stuff from university/college that you wish you'd recall now?
+- constantly annoy yourself with looking up some implementation detail, API definition or another fact,
+ that you need every couple of weeks, but juuuust manage to slip your mind the next time you require it?
+- feel like learning new stuff (perhaps to progress beyond your current job) is a https://en.wikipedia.org/wiki/Sisyphus[Sisyphean]
+ task that doesn't net you anything?
+
+If so, than this article is for you.
+
+.Intended audience
+****
+
+While the bulk of this article offers general information, the examples are tailored towards programmers, specifically
+ https://en.wikipedia.org/w/index.php?title=Java_virtual_machine&oldid=659766895[JVM] polyglot programmers. You have been warned.
+****
+
+== The Perils of Ad-Hoc Learning
+
+The nice thing about living now is having slightly more free time for your basic non-survival needs. The absolutely
+scary thing, in turn, is that the amount of information you have access to, and can gain, is simply overwhelming. Understandably
+this becomes even worse for IT professionals, what with a new library/framework coming out every week footnote:[and a Javascript implementation following up
+in 5 days.].
+
+Of course, a lot of this information is fire-and-forget. Another portion you use day to day and, by this virtue, remember
+without any problems.
+
+What's left can be divided into two broad categories.
+
+One is knowledge that you use in irregular, but relatively frequent intervals. An example would be an API quirk that
+you keep re-reading about every couple of weeks. Irritating, isn't it? Also wasteful.
+
+The other contains "core" knowledge - stuff that you're not _necessarily_ using directly, but nevertheless benefit from
+recalling it readily. Forgetting this kind of information is much more insidious - you just end up doing stuff less effectively; or, perhaps
+one day you suddenly realize that you completely forgot all the things you wanted to learn from the course you did half a
+  year ago.
+
+
+.But, but, the Internet!
+****
+
+A commonly raised counterargument against investing time in recall methods boils down to:
+
+> Why bother? Everything is on the Internet anyway, if I don't remember something, I'll just look it up!
+
+And sure, you can do that. But how much does it cost you?
+
+Here's the example for the majority of you reading this that are coders: how to write a binary literal in Java? Regardless of whether
+you know this or not, take your favorite stopwatch app footnote:[I expect very few people still have actual stopwatches, digital or analog.],
+and try out finding the answer on the Internet.
+
+I'd be willing to bet that for most of you, the total time between switching away from this article, and returning to it after searching will
+be slightly north of 10 seconds.
+
+That's not a lot, right? But those search bits add up during the day, *and* you need to factor in the
+https://en.wikipedia.org/wiki/Task_switching[context switch] costs
+footnote:[Also, let's not kid ourselves, you probably took this as a challenge and done the search than you would normally do under
+ this kind of situation.].
+
+Now try to recall the answer to the question, again: "how to write a binary literal in Java?". It probably took you less than a second to
+remember. That is an order of magnitude of a difference. Making a somewhat strained analogy, it's quite similar to the difference between
+reading from disk and reading from RAM.
+
+Of course, you're still spending time by putting additional effort into knowledge retention - but that's _dedicated_ time,
+as opposed to hacking up your work routine into disjointed bits.
+****
+
+== Spaced Repetition - a solution
+
+Obviously no one is going to sit around every day working on remember their cumulatively growing knowledge by rote.
+
+But there are shortcuts to do something very similar much more efficiently.
+
+The concept of https://en.wikipedia.org/w/index.php?title=Spaced_repetition&oldid=656222625[Spaced Repetition] offers one such
+shortcut. There are many implementations exploiting the idea, but they all boil down to taking advantage of
+  https://en.wikipedia.org/w/index.php?title=Spacing_effect&oldid=635962055[particularities of the human brain] in order to
+  achieve effective recall of various facts and concepts, with relatively minimal effort.
+
+== An SR-based approach
+
+One such implementation is http://ankisrs.net/[Anki]. It's https://en.wikipedia.org/w/index.php?title=Flashcard&oldid=653079387[flashcard]-based
+spaced repetition software. The tl;dr version of the process of working with flashcards and SRS looks like this:
+
+* you create a flashcard. In the simplest version it's a note with two faces: the prompt for what you want to learn, and
+ the thing you want to learn. Here's a couple of examples.
+
+image::anki-cards-overview.png[align="center", height="343", width="1080", title="A selection of Anki cards: normal text, source code, image, LaTeX formulas."]
+
+* after several initial repetitions, Anki prompts you with the cards, in increasing time intervals: initially a couple of days,
+ then a couple of weeks, months, and so on. At each repetition, when viewing the answer, you are prompted to choose one of the following options:
+** "Again" which means you forgot about the entry, and need to reset the learning process,
+** "Good" meaning you have good recollection, i.e. the vanilla option,
+** "Hard" implying that you've _sorta_ learned, but aren't quite confident, leading to a shorter time to repetition,
+** "Easy" that tells the system to extend the time interval to a greater extent than with "Good".
+
+As you have probably figured it out, the biggest benefit from this system is that the time intervals are managed automatically, and you get
+automatic reminders to repeat your cards (which is especially useful if you install the mobile client).
+
+.Local Flavor
+****
+Anki's repetition selection algorithm is a derivative of https://en.wikipedia.org/w/index.php?title=SuperMemo&oldid=618419134[SM2],
+which was invented in Poland.
+****
+
+== The Scheme
+
+Based on using Anki for knowledge retention, I've developed a learning scheme to keep myself from forgetting the stuff
+I'd rather remember. Given a new source material (e.g. a book, an online course), here's how it looks like.
+
+=== Step 0: Choose what to learn
+
+Probably the most important step - you need to *consciously*, and *responsibly*, ask yourself the question: "what knowledge do I need to retain
+effectively"? This is something that you optimally should work out for yourself.
+
+However, I can provide three pointers:
+
+- The best fit should align with one of the two categories I've described in the <<the_perils_of_ad_hoc_learning,introductory sections>>.
+- You already need to *understand* whatever you're trying to recall - the scheme I'm describing want help you with that.
+- *Don't* start with adding "feel-good stuff" - knowledge that you always wanted to recall off the top of your head in order to impress yourself.
+You'll most likely, eventually get frustrated and see the exercise as a waste of time. Do begin with applying this learning method to things
+ you actually *need*.
+
+
+=== Step 1: Highlight Key Passages (Optional)
+
+This is of course only relevant for textual sources. I still recommend it whenever you're learning from those, because
+it helps you stay in the flow.
+
+=== Step 2: Create Mind-map-like notes
+
+Regularly, for each piece of content (video for online courses, chapter for a book, etc.), add notes to a mind map describing
+the thing you're currently learning about footnote:[I usually keep a map e.g. per book.].
+
+This may seem like a superfluous step, but it helps in three things:
+
+- it actually helps with knowledge retention by preliminarily organizing it,
+- it makes the next step go faster, since you don't have to re-read/-watch the entire content,
+- most importantly, it helps to verify whether you've understood what you're learning about. You will very likely to see
+ that you're e.g. writing nonsense at this point, and it's less frustrating to identify it and fix it than in the next
+ step.
+
+
+NOTE: I say "mind-map-like" because someone might argue that the notes might not necessarily look like a "proper" mind map, i.e.
+there are no colors, graphics, etc. Nevertheless, I think the form of a tree, which mindmaps take, is the most conducive
+ to general, rapid note-taking.
+
+For the actual mind mapping I prefer to use http://freemind.sourceforge.net/wiki/index.php/Main_Page[Freemind]. It's open source,
+free, multiplatform, and offers a set of convenient keyboard shortcuts for quick note-taking.
+
+image::freemind-example.png[align="center", role="thumb", title="A mind-map example - an (outdated) mind map of Akka documentation."]
+
+=== Step 3: Extract flashcards from the mind map in Anki Desktop
+
+Now that you have rapid-access notes, it's time to go through them and create the flashcards. We'll mostly be dealing with
+"classic cards", i.e. with two faces - an entry, and whatever you should recall according regarding the entry. However, there
+are also other types: reversed (where the "entry"-"recall" relation is bilateral, effectively doubling the given card), and cloze
+completion, where you "fill" in text (useful for e.g. learning phrases in foreign languages).
+
+Also, you can insert almost everything into a card, including:
+
+- plain and formatted texts,
+- pictures,
+- sounds,
+- LaTeX, including complex formulas in math mode,
+- source code, https://ankiweb.net/shared/info/491274358[with the correct plugin] footnote:[Did I mention Anki has https://ankiweb.net/shared/addons/[a large
+plugin directory]?].
+
+See the figure <<an_sr_based_approach,in the introductory section>> for some examples.
+
+=== Step 4: Learn from flashcards in the Anki Mobile Client(s)
+
+image::anki-learning-example.png[float="right", width="230", height="1", role="thumb", title="Reviewing a card in Anki."]
+
+Whereas the Desktop client is more conducive to creating (and reviewing) cards, I find it much better to actually learn
+by using the Anki software on mobile devices (iOS/Android footnote:[While the Android version is completely Open Source, the
+iOS version is paid-for, and, in fact, the latter is currently the main source of monetary support from the project.]).
+
+Principally, this is because, with the mobile client, you have less distractions. And trust me, during the beginnings,
+once the initial enthusiasm wears out but _before_ you see tangible benefits, you will need all the focus you can get.
+
+Another, equally important thing is that you will have access to the cards wherever you go. This makes it an easier to
+form the habit of reviewing the cards daily, especially in the case of the Android client, where you can also add a widget
+to your home screen.
+
+=== Step 5: Review, Heal, and Grow your flashcard "Deck"
+
+Your cards, once created, should _not_ be treated as if set in stone. Splitting a card, improving it, suspending it, or removing
+it altogether should all be options you need to consider.
+
+== Enough theory, time for practice
+
+=== Step 0: Choose what to learn
+
+For this article, I've decided to use the example of http://www.scalatest.org/user_guide/using_matchers[ScalaTest matchers].
+That topic makes a good example, because:
+
+- the subjects squarely in the category of "in one ear, out the other" ,
+- remembering brings a tangible benefit - reports for the specialised matchers are more meaningful than those from a simple `should be equal`.
+
+Let's start, shall we?
+
+=== Step 1: Highlight Key Passages (Optional)
+
+The matcher documentation (again, http://www.scalatest.org/user_guide/using_matchers[available here]) is actually a
+good case where this step can be skipped. The docs are compact, information-rich, and the most notable facts are plainly
+ visible.
+
+=== Step 2: Create Mind-map-like notes
+
+First of all, we're not actually going to do the full docs, just enough to create a relatively good example. So, let's do
+the first 3 sections, up to and including "checking strings".
+
+Here's how a note-centered mind map might look like:
+
+image::freemind-scalatest.png[align="center", role="thumb", title="The resultant mind map."]
+
+You might notice the following things:
+
+- consistently with "normal" mind maps, items progressively become less general and more specific the further away from the center,
+- also like "normal" mind maps, items connected "physically" are also related semantically footnote:[There are no additional connections in this particular example, but, in
+general, it's OK to make them.],
+- _unlike_ typical mind maps, there very little formatting and decorations were applied. This is because the map is intended to be a transitory step,
+and not something you will revisit often. Normally, the only formatting I do is hyperlinks and icons for denoting especially important stuff.
+- only a portion of the information from the doc page is included. It's a deliberate decision - the goal is to provide a source for
+ quickly writing up cards, which are supposed to help you in the long-term - so we're looking for stuff that's most useful. In other words,
+ we need the info for your regular life/work, and *not* to prepare for a fire-and-forget exam.
+
+=== Step 3: Extract flashcards from the mind map in Anki Desktop
+
+Let's open https://ankisrs.net/[Anki] Desktop now. First, click `Create Deck` footnote:[A deck is simply a collection of Anki cards.]. Since I already have a `Scala` deck,
+I'm going to make a subdeck, which is done by writing `Scala::ScalaTest`. After the deck is created, click on it.
+
+image::anki-newdeck.png[align="center", height="1", width="720", title="Ready to add cards."]
+
+Now, we're ready to create the cards proper. Click on `Add` at the top footnote:[Yes, the Anki UI is sometimes all over the place.].
+
+image::anki-newcard.png[align="center", height="1", width="500", title="New card to be filled out."]
+
+You'll be presented with a view similar to the above (the additional UI elements mostly come from the https://ankiweb.net/shared/info/491274358[source code plugin]).
+
+We're going to out of order and start with the second point - asserting size and/or length - since it's more straightforward. Let's start with the length:
+
+ - Front: I recommend this to be titled in the way that is the most similar to how you'd try to recall the relevant information. In this case, I'd
+ write "ScalaTest - asserting length".
+ - Back: this should contain the relevant information in the most concise way. In this case, all we need is the text of the assert, e.g. `have length X`
+ footnote:[Pardon the faint red markings on the illustration - there seems to be a bug in the Anki Linux
+ client that makes disabling the spellcheck impossible, hence a quick photoedit job.].
+
+image::anki-newcard-filled.png[align="center", height="1", width="500", title="Card filled out."]
+
+Now, do the same for asserting size. Here you might think whether it wouldn't be more efficient to store both pieces of information in a single card. In
+practice, I find that it's much more worthwhile to split information into as many cards as possible, as simple cards are much easier to learn and hence
+produce a better retention effect.
+
+Going up next, we have the string comparisons. Here, I'd suggest to create 8 cards:
+
+ - 3 per each "simple" matcher
+ - 4 per each "regex" matcher
+ - 1 for the `withGroups` matcher qualifier.
+
+image::anki-card-simple-filled.png[align="center", height="1", width="500", title="Simple comparison, note slogan-like front naming."]
+
+After that, we've got comparisons. Here, I'm going to create just two cards, one per every strict/equal-or pair, since the cases appear to be both
+semantically and "graphically" coupled.
+
+image::anki-card-standard.png[align="center", height="1",width="500", title="Two pieces of info, but still pretty straightforward."]
+
+Note that here I'm omitting the `Ordering[T]` information, as I'm making the assumption that I can rely on the compiler for recalling that tidbit.
+_However_, if you e.g. use lots of custom classes with dedicated `Ordering` implementations, creating an additional card might be worth your while.
+
+Finally, let's go back to the general equality case. The `be` card is pretty straightforward:
+
+image::anki-card-complex-entry.png[align="center", height="1", width="500", title="Simple equality."]
+
+However, for the `equal` we have to cram some info on the back:
+
+image::anki-card-complex.png[align="center", height="1", width="500", title="The most complex card type you should be making."]
+
+This is unfortunate, however sometimes you have pieces of information that are inseparable.
+
+And there you have it! If you want to study using the cards created for this section, download link:{imagesdir}Scala__ScalaTest.apkg[the pack from here].
+
+=== Step 4: Learn from flashcards in the Anki Mobile Client(s)
+
+Now that we've created the cards, we can move to actually using them. For that, you'll need to:
+
+. Get the mobile client, in either the https://play.google.com/store/apps/details?id=com.ichi2.anki[Android] or
+https://itunes.apple.com/us/app/ankimobile-flashcards/id373493387?mt=8&ign-mpt=uo%3D4[iOS] versions
+. Set up http://ankisrs.net/docs/manual.html#ankiweb-and-synchronization[AnkiWeb synchronization] between your desktop client
+and your mobile device.
+
+IMPORTANT: Please be aware of the https://ankiweb.net/account/terms[content policies] before you sync data through AnkiWeb.
+
+Now that you've set it up, and open the synced deck, you should see something like the following:
+
+image::anki-mobile-starting.png[align="left", width="230", height="1", role="thumb", title="Before..."]
+
+image::anki-mobile-starting-answer.png[align="right", width="230", height="1", role="thumb", title="...and after the first answer."]
+
+You're viewing a new card in the learning stage, which will require at least one repetition on the same day. Always choose the
+option that authentically reflects your recall ability of that card. Eventually, you should arrive at something similar to
+the following screen:
+
+image::anki-mobile-final-review.png[align="center", width="230", height="1", role="thumb", title="Last answer for now. Note the different time periods."]
+
+Now the choices extend beyond the same day. If your recall is increased effectively, the interval selection will lengthen at
+a geometric rate. So when in doubt, answer pessimistically - it won't "cost" you much time.
+
+.Use the Widget
+****
+If you're using Android, the widget is a nice feature. It shows you the amount of pending cards for the day, as well
+as the projected time required for going over them.
+****
+
+=== Step 5: Review, Heal, and Grow your flashcard "Deck"
+
+This is probably the most personalized of the steps. However, a couple common issues might manifest, most notably:
+
+==== Errors on the cards
+
+Factual, typographical or otherwise: minor ones can be remedied immediately through the mobile client, but
+for more complex stuff, your best bet is to mark the card by favoriting it, and potentially http://ankisrs.net/docs/manual.html#editing-and-more[burying the card], "postponing" it
+to the following day, if the problem is severe enough so that you can't meaningfully review the card footnote:[Often happens with formulas encoded in LaTeX, as the mobile client
+ is notoriously fickle when displaying them.].
+
+image::anki-bury-favorite.png[float="right", width="230", height="1", role="thumb", title="`Hide/Delete` will show `Bury`."]
+
+==== Lack of perceived benefit from using the cards for a _particular_ topic
+
+This mostly stems from not enough understanding
+of the subject matter. With this method, always try to make a conscious effort to actually _comprehend_ and _integrate_ the source material.
+This even applies to our relatively simple example - the retention effect for the ScalaTest will be much greater if you practice
+writing the matcher expressions during the the initial days.
+
+==== General frustration
+
+In other words, the bog standard reaction to a new habit that one is trying to form. After the initial enthusiasm dwindles,
+the act of repeating the cards might appear like a chore. In this case, I advise you to
+
+- simply stick it out if you're only a couple of weeks in,
+- be honest - if you forgot the card's content, choose "Again",
+- otherwise try to remember situations where the use of this technique has improve recall, and
+- take note of how much time have you've already spent by using this method footnote:[Yes, I'm basically suggesting an abuse of humanity's
+ susceptibility to the https://en.wikipedia.org/w/index.php?title=Gambler%27s_fallacy&oldid=663853840[Gambler's Fallacy].].
+
+==== Recalling knowledge you no longer need
+
+It happens, whether when studying for actual exams, investing in learning a technology that
+didn't pan out, or for other reasons. In this case, you just need to http://ankisrs.net/docs/manual.html#editing-and-more[suspend]
+the relevant cards, causing them to no longer appear until they're manually resumed.
+
+==== Amassing a huge backlog
+
+- To prevent that, start small (<100 cards total) until you get the gist of it, and try to set aside
+ some regularly scheduled period in your daily routine for the card review - for example, during your daily commute footnote:[Which was how I started.].
+- To resolve it, just chip away at the mass of cards for several days. Due to how the SRS algorithm works, you are bound to eventually reduce the
+ backlog to a manageable size.
+
+== So how does it work out, really?
+
+While I can't offer you any peer-reviewed, https://en.wikipedia.org/wiki/Blind_experiment#Double-blind_trials[double-blind] study on the
+validity of the method I've described above. _Subjectively_ however, I can tell you that I am convinced adopting the technique has had
+a great effect on improving the time effectiveness of learning stuff I want to know. Without fail, for every such source, whether
+a book, a course, technical documentation or otherwise, I have progressed beyond just that "feel-good" sensation and actually was able
+ to recall the most important information many, many months after first absorbing it.
+
+However, I do have some objective, if not statistically representative, data. Take a look at the following figures, which describe
+ the total time and total number of card reviews throughout my entire usage history, with my ~850 card collection, grown over time:
+
+image::anki-stats.png[align="center", role="thumb", title="Stats since day 1. Note the time per day."]
+
+As you can see, the amount of time per day, even if artificially inflated by the aforementioned commuting, is laughably small
+when compared to the benefits. The benefits themselves, in turn, are indirectly demonstrated by the portion of "relearn" (i.e. "I forgot all
+about it") card reviews in the overall scheme - Anki/SRS really is that effective in helping you remember footnote:[A recent example - after preparing a
+simple deck, and some minimal practice, I was able to write complex MongoDB aggregations off the top of my head, many months after completing the related
+online course.].
+
+== In closing
+
+It would be a disservice to Anki if I'd fail to mention that it is also an excellent tool for helping in learning a language. Anki was, after all,
+ https://groups.google.com/d/msg/anki-users/M8mDFN7-H-I/P2bRBmm2aQEJ[originally created to aid its author in studying Japanese].
+
+In fact, a comprehensive collection of community-created decks https://ankiweb.net/shared/decks/[has been made available], spanning
+ not only multiple languages but also subjects such as Biology, Geography, Physics, and others.
+
+Finally, I hope I have shared some of the enthusiasm for Spaced-Repetition-assisted learning in the context of technical knowledge footnote:[and haven't bored you to tears while
+at it.]. I encourage you to try it out for a small dataset, and see how it goes - as long as you have a minimum of self-control and curiosity, you should benefit
+from adopting this technique. Maybe it https://en.wikipedia.org/w/index.php?title=Roger_Craig_%28Jeopardy!_contestant%29&oldid=651710417#Preparation[won't help *you* win "Jeopardy!"],
+but it will certainly provide you with a powerful tool when dealing with the ever increasing corpus of information that must be absorbed in
+order to stay up to date, and to keep in touch with the "core" knowledge that serves as the foundation for your daily technical decisions.
