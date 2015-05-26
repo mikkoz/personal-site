@@ -1,0 +1,122 @@
+= Spaced-Repetition-assisted durable learning of technical concepts with Freemind and Anki: Part 1: Introduction
+Mikołaj Koziarkiewicz
+2015-05-28
+:jbake-type: post
+:jbake-status: draft
+:jbake-tags: blog, general, anki, spaced repetition, freemind, learning
+:experimental:
+:idprefix:
+:imagesdir: {jbake_url_illustrations}/anki/
+:caption:
+
+== Intro
+
+Have you ever:
+
+- regretted that you only remember some bare trivia from a course or a book that you studied several months ago? Or
+ maybe even stuff from university/college that you wish you'd recall now?
+- constantly annoy yourself with looking up some implementation detail, API definition or another fact,
+ that you need every couple of weeks, but juuuust manage to slip your mind the next time you require it?
+- feel like learning new stuff (perhaps to progress beyond your current job) is a https://en.wikipedia.org/wiki/Sisyphus[Sisyphean]
+ task that doesn't net you anything?
+
+If so, than this series of articles is for you.
+
+== The Perils of Ad-Hoc Learning
+
+The nice thing about living now is having slightly more free time for your basic non-survival needs. The absolutely
+scary thing, in turn, is that the amount of information you have access to, and can gain, is simply overwhelming. Understandably
+this becomes even worse for IT professionals, what with a new library/framework coming out every week footnote:[and a Javascript implementation following up
+in 5 days.].
+
+Of course, a lot of this information is fire-and-forget. Another portion you use day to day and, by this virtue, remember
+without any problems.
+
+What's left can be divided into two broad categories.
+
+One is knowledge that you use in irregular, but relatively frequent intervals. An example would be an API quirk that
+you keep re-reading about every couple of weeks. Irritating, isn't it? Also wasteful.
+
+The other contains "core" knowledge - stuff that you're not _necessarily_ using directly, but nevertheless benefit from
+recalling it readily. Forgetting this kind of information is much more insidious - you just end up doing stuff less effectively; or, perhaps
+one day you suddenly realize that you completely forgot all the things you wanted to learn from the course you did half a
+  year ago.
+
+
+.But, but, the Internet!
+****
+
+A commonly raised counterargument against investing time in recall methods boils down to:
+
+> Why bother? Everything is on the Internet anyway, if I don't remember something, I'll just look it up!
+
+And sure, you can do that. But how much does it cost you?
+
+Here's an example: remind yourself of the last small fact or info tidbit that you required and you needed to search for. Now,
+take your favorite stopwatch app footnote:[I expect very few people still have actual stopwatches, digital or analog.],
+and try out finding the answer on the Internet.
+
+I'd be willing to bet that for most of you, the total time between switching away from this article, and returning to it after searching will
+be slightly north of 10 seconds.
+
+That's not a lot, right? But those search bits add up during the day, *and* you need to factor in the
+https://en.wikipedia.org/wiki/Task_switching[context switch] costs
+footnote:[Also, let's not kid ourselves, you probably took this as a challenge and done the search than you would normally do under
+ this kind of situation.].
+
+Now try to recall the answer again, from memory. You, quite likely, still can, and it probably took you less than a second to
+remember. That is an order of magnitude of a difference. Making a somewhat strained analogy, it's quite similar to the difference between
+reading from disk and reading from RAM.
+
+Of course, you're still spending time by putting additional effort into knowledge retention - but that's _dedicated_ time,
+as opposed to hacking up your work routine into disjointed bits.
+****
+
+== Spaced Repetition - a solution
+
+Obviously no one is going to sit around every day working on remember their cumulatively growing knowledge by rote.
+
+But there are shortcuts to do something very similar much more efficiently.
+
+The concept of https://en.wikipedia.org/w/index.php?title=Spaced_repetition&oldid=656222625[Spaced Repetition] offers one such
+shortcut. There are many implementations exploiting the idea, but they all boil down to taking advantage of
+  https://en.wikipedia.org/w/index.php?title=Spacing_effect&oldid=635962055[particularities of the human brain] in order to
+  achieve effective recall of various facts and concepts, with relatively minimal effort.
+
+== An SR-based approach
+
+One such implementation is http://ankisrs.net/[Anki]. It's https://en.wikipedia.org/w/index.php?title=Flashcard&oldid=653079387[flashcard]-based
+spaced repetition software. Its http://ankisrs.net/docs/manual.html[documentation can be found here], and it's available for download on:
+
+- http://ankisrs.net/#windows[Windows],
+- http://ankisrs.net/#mac[Mac OS X],
+- http://ankisrs.net/#linux[Linux],
+- http://ankisrs.net/#ios[Android and iOS].
+
+The tl;dr version of the process of working with flashcards and SRS looks like this:
+
+* you create a flashcard. In the simplest version it's a note with two faces: the prompt for what you want to learn, and
+ the thing you want to learn. Here's a couple of examples.
+
+image::anki-cards-overview.png[align="center", height="343", width="1080", title="A selection of Anki cards: normal text, source code, image, LaTeX formulas."]
+
+* after several initial repetitions, Anki prompts you with the cards, in increasing time intervals: initially a couple of days,
+ then a couple of weeks, months, and so on. At each repetition, when viewing the answer, you are prompted to choose one of the following options:
+** "Again" which means you forgot about the entry, and need to reset the learning process,
+** "Good" meaning you have good recollection, i.e. the vanilla option,
+** "Hard" implying that you've _sorta_ learned, but aren't quite confident, leading to a shorter time to repetition,
+** "Easy" that tells the system to extend the time interval to a greater extent than with "Good".
+
+As you have probably figured it out, the biggest benefit from this system is that the time intervals are managed automatically, and you get
+automatic reminders to repeat your cards (which is especially useful if you install the mobile client).
+
+.Local Flavor
+****
+Anki's repetition selection algorithm is a derivative of https://en.wikipedia.org/w/index.php?title=SuperMemo&oldid=618419134[SM2],
+which was invented in Poland.
+****
+
+== Coming Up
+
+In link:srs-assisted-learning-scheme-theory-draft.html[the second episode of this series], we will talk about a learning scheme developed empirically by Yours Truly, that takes
+advantage of Anki when acquiring technical (and other) knowledge.

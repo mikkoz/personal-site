@@ -1,0 +1,47 @@
+= Spaced-Repetition-assisted durable learning of technical concepts with Freemind and Anki: Part 4: Statistics and Conclusions
+Mikołaj Koziarkiewicz
+2015-06-28
+:jbake-type: post
+:jbake-status: draft
+:jbake-tags: blog, general, anki, spaced repetition, freemind, learning
+:experimental:
+:idprefix:
+:imagesdir: {jbake_url_illustrations}/anki/
+:caption:
+
+== Previously
+
+We've link:srs-assisted-learning-scheme-practice-draft.html[just went over a practical example of the scheme]. Now, let's talk stats and conclusions.
+
+== So how does it work out, really?
+
+While I can't offer you any peer-reviewed, https://en.wikipedia.org/wiki/Blind_experiment#Double-blind_trials[double-blind] study on the
+validity of the method I've described above. _Subjectively_ however, I can tell you that I am convinced adopting the technique has had
+a great effect on improving the time effectiveness of learning stuff I want to know. Without fail, for every such source, whether
+a book, a course, technical documentation or otherwise, I have progressed beyond just that "feel-good" sensation and actually was able
+ to recall the most important information many, many months after first absorbing it.
+
+However, I do have some objective, if not statistically representative, data. Take a look at the following figures, which describe
+ the total time and total number of card reviews throughout my entire usage history, with my ~850 card collection, grown over time:
+
+image::anki-stats.png[align="center", role="thumb", title="Stats since day 1. Note the time per day."]
+
+As you can see, the amount of time per day, even if artificially inflated by the aforementioned commuting, is laughably small
+when compared to the benefits. The benefits themselves, in turn, are indirectly demonstrated by the portion of "relearn" (i.e. "I forgot all
+about it") card reviews in the overall scheme - Anki/SRS really is that effective in helping you remember footnote:[A recent example - after preparing a
+simple deck, and some minimal practice, I was able to write complex MongoDB aggregations off the top of my head, many months after completing the related
+online course.].
+
+== In closing
+
+It would be a disservice to Anki if I'd fail to mention that it is also an excellent tool for helping in learning a language. Anki was, after all,
+ https://groups.google.com/d/msg/anki-users/M8mDFN7-H-I/P2bRBmm2aQEJ[originally created to aid its author in studying Japanese].
+
+In fact, a comprehensive collection of community-created decks https://ankiweb.net/shared/decks/[has been made available], spanning
+ not only multiple languages but also subjects such as Biology, Geography, Physics, and others.
+
+Finally, I hope I have shared some of the enthusiasm for Spaced-Repetition-assisted learning in the context of technical knowledge footnote:[and haven't bored you to tears while
+at it.]. I encourage you to try it out for a small dataset, and see how it goes - as long as you have a minimum of self-control and curiosity, you should benefit
+from adopting this technique. Maybe it https://en.wikipedia.org/w/index.php?title=Roger_Craig_%28Jeopardy!_contestant%29&oldid=651710417#Preparation[won't help *you* win "Jeopardy!"],
+but it will certainly provide you with a powerful tool when dealing with the ever increasing corpus of information that must be absorbed in
+order to stay up to date, and to keep in touch with the "core" knowledge that serves as the foundation for your daily technical decisions.

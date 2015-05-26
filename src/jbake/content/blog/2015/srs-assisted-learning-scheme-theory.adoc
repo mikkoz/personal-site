@@ -1,0 +1,104 @@
+= Spaced-Repetition-assisted durable learning of technical concepts with Freemind and Anki: Part 2: Putting it all together
+Mikołaj Koziarkiewicz
+2015-06-08
+:jbake-type: post
+:jbake-status: draft
+:jbake-tags: blog, general, anki, spaced repetition, freemind, learning
+:experimental:
+:idprefix:
+:imagesdir: {jbake_url_illustrations}/anki/
+:caption:
+
+== Previously
+
+In the link:srs-assisted-learning-intro-draft.html[starting article], I've provided a quick overview of what Spaced Repetition means,
+and talked about the tools that can facilitate it. Now, let's see how we can put these tools to good use.
+
+== The Scheme
+
+Based on using Anki for knowledge retention, I've developed a learning scheme to keep myself from forgetting the stuff
+I'd rather remember. Given a new source material (e.g. a book, an online course), here's how it looks like.
+
+=== Step 0: Choose what to learn
+
+Probably the most important step - you need to *consciously*, and *responsibly*, ask yourself the question: "what knowledge do I need to retain
+effectively"? This is something that you optimally should work out for yourself.
+
+However, I can provide three pointers:
+
+- The best fit should align with one of the two categories I've described in the <<the_perils_of_ad_hoc_learning,introductory sections>>.
+- You already need to *understand* whatever you're trying to recall - the scheme I'm describing want help you with that.
+- *Don't* start with adding "feel-good stuff" - knowledge that you always wanted to recall off the top of your head in order to impress yourself.
+You'll most likely, eventually get frustrated and see the exercise as a waste of time. Do begin with applying this learning method to things
+ you actually *need*.
+
+
+=== Step 1: Highlight Key Passages (Optional)
+
+This is of course only relevant for textual sources. I still recommend it whenever you're learning from those, because
+it helps you stay in the flow.
+
+=== Step 2: Create Mind-map-like notes
+
+Regularly, for each piece of content (video for online courses, chapter for a book, etc.), add notes to a mind map describing
+the thing you're currently learning about footnote:[I usually keep a map e.g. per book.].
+
+This may seem like a superfluous step, but it helps in three things:
+
+- it actually helps with knowledge retention by preliminarily organizing it,
+- it makes the next step go faster, since you don't have to re-read/-watch the entire content,
+- most importantly, it helps to verify whether you've understood what you're learning about. You will very likely to see
+ that you're e.g. writing nonsense at this point, and it's less frustrating to identify it and fix it than in the next
+ step.
+
+
+NOTE: I say "mind-map-like" because someone might argue that the notes might not necessarily look like a "proper" mind map, i.e.
+there are no colors, graphics, etc. Nevertheless, I think the form of a tree, which mindmaps take, is the most conducive
+ to general, rapid note-taking.
+
+For the actual mind mapping I prefer to use http://freemind.sourceforge.net/wiki/index.php/Main_Page[Freemind]. It's open source,
+free, multiplatform, and offers a set of convenient keyboard shortcuts for quick note-taking.
+
+image::freemind-example.png[align="center", role="thumb", title="A mind-map example - an (outdated) mind map of Akka documentation."]
+
+=== Step 3: Extract flashcards from the mind map in Anki Desktop
+
+Now that you have rapid-access notes, it's time to go through them and create the flashcards. We'll mostly be dealing with
+"classic cards", i.e. with two faces - an entry, and whatever you should recall according regarding the entry. However, there
+are also other types: reversed (where the "entry"-"recall" relation is bilateral, effectively doubling the given card), and cloze
+completion, where you "fill" in text (useful for e.g. learning phrases in foreign languages).
+
+Also, you can insert almost everything into a card, including:
+
+- plain and formatted texts,
+- pictures,
+- sounds,
+- LaTeX, including complex formulas in math mode,
+- source code, https://ankiweb.net/shared/info/491274358[with the correct plugin] footnote:[Did I mention Anki has https://ankiweb.net/shared/addons/[a large
+plugin directory]?].
+
+See the figure <<an_sr_based_approach,in the introductory section>> for some examples.
+
+=== Step 4: Learn from flashcards in the Anki Mobile Client(s)
+
+image::anki-learning-example.png[float="right", width="230", height="1", role="thumb", title="Reviewing a card in Anki."]
+
+Whereas the Desktop client is more conducive to creating (and reviewing) cards, I find it much better to actually learn
+by using the Anki software on mobile devices (iOS/Android footnote:[While the Android version is completely Open Source, the
+iOS version is paid-for, and, in fact, the latter is currently the main source of monetary support from the project.]).
+
+Principally, this is because, with the mobile client, you have less distractions. And trust me, during the beginnings,
+once the initial enthusiasm wears out but _before_ you see tangible benefits, you will need all the focus you can get.
+
+Another, equally important thing is that you will have access to the cards wherever you go. This makes it an easier to
+form the habit of reviewing the cards daily, especially in the case of the Android client, where you can also add a widget
+to your home screen.
+
+=== Step 5: Review, Heal, and Grow your flashcard "Deck"
+
+Your cards, once created, should _not_ be treated as if set in stone. Splitting a card, improving it, suspending it, or removing
+it altogether should all be options you need to consider.
+
+== Coming Up
+
+In link:srs-assisted-learning-scheme-practice-draft.html[the next installment], we'll go from theory to practice and see how it pans out.
