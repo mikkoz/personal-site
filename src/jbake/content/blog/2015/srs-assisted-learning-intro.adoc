@@ -1,8 +1,8 @@
 = Spaced-Repetition-assisted durable learning of technical concepts with Freemind and Anki: Part 1: Introduction
 Mikołaj Koziarkiewicz
-2015-05-28
+2015-06-16
 :jbake-type: post
-:jbake-status: draft
+:jbake-status: published
 :jbake-tags: blog, general, anki, spaced repetition, freemind, learning
 :experimental:
 :idprefix:
@@ -104,7 +104,7 @@ image::anki-cards-overview.png[align="center", height="343", width="1080", title
  then a couple of weeks, months, and so on. At each repetition, when viewing the answer, you are prompted to choose one of the following options:
 ** "Again" which means you forgot about the entry, and need to reset the learning process,
 ** "Good" meaning you have good recollection, i.e. the vanilla option,
-** "Hard" implying that you've _sorta_ learned, but aren't quite confident, leading to a shorter time to repetition,
+** "Hard" implying thatas you've _sorta_ learned, but aren't quite confident, leading to a shorter time to repetition,
 ** "Easy" that tells the system to extend the time interval to a greater extent than with "Good".
 
 As you have probably figured it out, the biggest benefit from this system is that the time intervals are managed automatically, and you get
@@ -118,5 +118,12 @@ which was invented in Poland.
 
 == Coming Up
 
+////
+
 In link:srs-assisted-learning-scheme-theory-draft.html[the second episode of this series], we will talk about a learning scheme developed empirically by Yours Truly, that takes
+advantage of Anki when acquiring technical (and other) knowledge.
+
+////
+
+In the second episode of this series, we will talk about a learning scheme developed empirically by Yours Truly, that takes
 advantage of Anki when acquiring technical (and other) knowledge.
