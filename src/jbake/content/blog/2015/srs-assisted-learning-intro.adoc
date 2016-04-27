@@ -1,4 +1,4 @@
-= Spaced-Repetition-assisted durable learning of technical concepts with Freemind and Anki: Part 1: Introduction
+= Learn AND remember with Anki: Part 1: Introduction
 Mikołaj Koziarkiewicz
 2015-06-16
 :jbake-type: post
@@ -118,12 +118,5 @@ which was invented in Poland.
 
 == Coming Up
 
-////
-
-In link:srs-assisted-learning-scheme-theory-draft.html[the second episode of this series], we will talk about a learning scheme developed empirically by Yours Truly, that takes
-advantage of Anki when acquiring technical (and other) knowledge.
-
-////
-
-In the second episode of this series, we will talk about a learning scheme developed empirically by Yours Truly, that takes
+In http://mikołak.net/blog/2015/srs-assisted-learning-scheme-theory.html[the second episode of this series], we will talk about a learning scheme developed empirically by Yours Truly, that takes
 advantage of Anki when acquiring technical (and other) knowledge.

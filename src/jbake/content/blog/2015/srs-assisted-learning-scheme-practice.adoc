@@ -1,8 +1,8 @@
-= Spaced-Repetition-assisted durable learning of technical concepts with Freemind and Anki: Part 3: From theory to practice
+= Learn AND remember with Anki: Part 3: From theory to practice
 Mikołaj Koziarkiewicz
-2015-06-18
+2015-08-04
 :jbake-type: post
-:jbake-status: draft
+:jbake-status: published
 :jbake-tags: blog, general, anki, spaced repetition, freemind, learning
 :experimental:
 :idprefix:
@@ -11,7 +11,7 @@ Mikołaj Koziarkiewicz
 
 == Previously
 
-link:srs-assisted-learning-scheme-theory-draft.html[During the last episode], we've discussed a learning scheme that
+http://mikołak.net/blog/2015/srs-assisted-learning-scheme-theory.html[During the last episode], we've discussed a learning scheme that
 can help you to avoid having most acquired information from floating away.
 
 In what follows, we'll use an example to walk through the scheme step by step.
@@ -199,5 +199,5 @@ the relevant cards, causing them to no longer appear until they're manually resu
 
 == Coming Up
 
-In link:srs-assisted-learning-stats-and-conclusions-draft.html[the final part of the series], we'll look at some actual statistics related to using Anki, and touch on some miscellaneous
+In http://mikołak.net/blog/2015/srs-assisted-learning-stats-and-conclusions.html[the final part of the series], we'll look at some actual statistics related to using Anki, and touch on some miscellaneous
 closing points.

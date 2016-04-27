@@ -1,8 +1,8 @@
-= Spaced-Repetition-assisted durable learning of technical concepts with Freemind and Anki: Part 2: Putting it all together
+= Learn AND remember with Anki: Part 2: Putting it all together
 Mikołaj Koziarkiewicz
-2015-06-08
+2015-06-23
 :jbake-type: post
-:jbake-status: draft
+:jbake-status: published
 :jbake-tags: blog, general, anki, spaced repetition, freemind, learning
 :experimental:
 :idprefix:
@@ -11,7 +11,7 @@ Mikołaj Koziarkiewicz
 
 == Previously
 
-In the link:srs-assisted-learning-intro-draft.html[starting article], I've provided a quick overview of what Spaced Repetition means,
+In the http://mikołak.net/blog/2015/srs-assisted-learning-intro.html[starting article], I've provided a quick overview of what Spaced Repetition means,
 and talked about the tools that can facilitate it. Now, let's see how we can put these tools to good use.
 
 == The Scheme
@@ -101,4 +101,4 @@ it altogether should all be options you need to consider.
 
 == Coming Up
 
-In link:srs-assisted-learning-scheme-practice-draft.html[the next installment], we'll go from theory to practice and see how it pans out.
+In http://mikołak.net/blog/2015/srs-assisted-learning-scheme-practice.html[the next installment], we'll go from theory to practice and see how it pans out.

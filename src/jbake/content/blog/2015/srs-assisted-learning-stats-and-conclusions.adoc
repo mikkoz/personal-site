@@ -1,8 +1,8 @@
-= Spaced-Repetition-assisted durable learning of technical concepts with Freemind and Anki: Part 4: Statistics and Conclusions
+= Learn AND remember with Anki: Part 4: Statistics and Conclusions
 Mikołaj Koziarkiewicz
-2015-06-28
+2015-08-26
 :jbake-type: post
-:jbake-status: draft
+:jbake-status: published
 :jbake-tags: blog, general, anki, spaced repetition, freemind, learning
 :experimental:
 :idprefix:
@@ -11,7 +11,7 @@ Mikołaj Koziarkiewicz
 
 == Previously
 
-We've link:srs-assisted-learning-scheme-practice-draft.html[just went over a practical example of the scheme]. Now, let's talk stats and conclusions.
+We've http://mikołak.net/blog/2015/srs-assisted-learning-scheme-practice.html[just went over a practical example of the scheme]. Now, let's talk stats and conclusions.
 
 == So how does it work out, really?
 
@@ -24,7 +24,7 @@ a book, a course, technical documentation or otherwise, I have progressed beyond
 However, I do have some objective, if not statistically representative, data. Take a look at the following figures, which describe
  the total time and total number of card reviews throughout my entire usage history, with my ~850 card collection, grown over time:
 
-image::anki-stats.png[align="center", role="thumb", title="Stats since day 1. Note the time per day."]
+image::anki-stats.png[align="center", role="thumb", title="Stats since day 1. Note the \"Average for days studied\" entry."]
 
 As you can see, the amount of time per day, even if artificially inflated by the aforementioned commuting, is laughably small
 when compared to the benefits. The benefits themselves, in turn, are indirectly demonstrated by the portion of "relearn" (i.e. "I forgot all
