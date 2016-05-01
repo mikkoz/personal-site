@@ -1,0 +1,300 @@
+= Painless, type-safe config file parsing with Macwire and Ficus
+Mikołaj Koziarkiewicz
+2016-04-30
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: blog, general, scala, configuration
+:experimental:
+:idprefix:
+
+== Intro
+
+Scala has a distinct advantage of an "official" configuration file format, i.e. https://github.com/typesafehub/config/blob/master/HOCON.md[HOCON].
+Even better, the niceness transcends the officialdom - HOCON is quite well-defined, and it has lots of useful of features. In other words, it's
+ simply a *good* format.
+
+Of course, any Scala developer past their Day 3 can tell you of a certain little quirk - the
+https://github.com/typesafehub/config[reference parser implementation] is a _Java_ library.
+Even though Java-Scala interop is actually mostly tolerable once one learns the ropes, it still remains slightly annoying.
+
+This post will describe a possible approach for reducing that annoyance by synergizing two well-known libs.
+
+NOTE: The following is intended for devs already minimally familiar with Macwire. If you're not, take
+https://github.com/adamw/macwire[a look at the README]. Reading the https://github.com/adamw/macwire#macwire[the Introduction] will
+suffice.
+
+
+== Config
+
+There are several popular pure-Scala HOCON parsing libraries available. We're going to use https://github.com/iheartradio/ficus[Ficus].
+
+As a library, it's extremely straightforward - specify the config file, the subpath within it, the type you want
+it to be parsed into - the lib will do the rest. It even supports extraction into
+https://github.com/iheartradio/ficus#supported-types[semi-arbitrary data types], like so:
+
+[source,hocon]
+----
+server {
+    host: "example.com"
+    port: 1024
+  }
+----
+
+[source,scala]
+----
+case class ServerConfig(host: String, port: Int)
+
+import net.ceedubs.ficus.Ficus._
+import net.ceedubs.ficus.readers.ArbitraryTypeReader._
+
+ConfigFactory.load().as[ServerConfig]("server")
+//emits ServerConfig("example.com", 1024)
+----
+
+== Ad Rem
+
+=== First Approach
+
+So, keeping with the https://en.wikipedia.org/wiki/Ficus_benjamina[theme], let's wire up a life support system for
+plants. Say we have two HTTP services - one for moisture control, and the other handling miscellaneous sensors:
+
+
+[source,scala]
+.services.scala
+----
+class HydroService(val config: ServerConfig) {
+    //logic goes here
+}
+
+class SensorService(val config: ServerConfig) {
+   //logic goes here
+}
+----
+
+where, again, the config class is:
+
+[source,scala]
+----
+case class ServerConfig(host: String, port: Int)
+----
+
+So, our config file could look like this:
+
+
+[source,hocon]
+----
+app {
+  hydro {
+    host: "hydro.example.com"
+    port: 8215
+  }
+
+  sensors {
+    host: "sensors.example.com"
+    port: 1777
+  }
+}
+----
+
+To make things sweet and simple, let's encapsulate the the entire (relevant) config into a container class:
+
+[source,scala]
+.AppConfig.scala
+----
+class AppConfig(val hydro: ServerConfig, val sensors: ServerConfig)
+
+case class ServerConfig(host: String, port: Int)
+----
+
+We'll now take the first stab at the application runner:
+
+[source,scala]
+.Run.scala
+----
+import com.softwaremill.macwire._
+import com.typesafe.config.ConfigFactory
+
+object Run extends App {
+
+  lazy val rawConfig = ConfigFactory.load()
+
+  import net.ceedubs.ficus.Ficus._
+  import net.ceedubs.ficus.readers.ArbitraryTypeReader._
+
+  lazy val config: AppConfig = rawConfig.as[AppConfig]("app") <1>
+
+  import config._ <2>
+
+  lazy val hydroService = wire[HydroService]
+  lazy val sensorService = wire[SensorService]
+
+  println(s"HydroService configured with ${hydroService.config}") <3>
+  println(s"SensorService configured with ${sensorService.config}")
+
+}
+----
+<1> It is a good idea for your app's config to be contained in a dedicated subpath, mostly for reasons
+of avoiding namespace clashes, but also due to https://github.com/ceedubs/ficus/issues/10[technical difficulties of loading the "root path"].
+<2> Bringing ServerConfig instances into scope.
+<3> Debug statements.
+
+Obviously, we'll end up with:
+
+[source,sbt]
+-----
+> runMain Run
+[info] Updating {file:}root-201604ficusplay...
+[info] Resolving jline#jline;2.12.1 ...
+[info] Done updating.
+[info] Compiling 3 Scala sources to target/scala-2.11/classes...
+[error] src/main/scala/Run.scala:24: Found multiple values of type [ServerConfig]: [List(sensors, hydro)]
+[error]   lazy val hydroService = wire[HydroService]
+[error]                               ^
+[error] src/main/scala/Run.scala:25: Found multiple values of type [ServerConfig]: [List(sensors, hydro)]
+[error]   lazy val sensorService = wire[SensorService]
+[error]                                ^
+[error] two errors found
+-----
+
+because Macwire cannot distinguish between the two `ServerConfig` instances pulled into scope with `import config._`.
+
+So, what can we do?
+
+=== Tagging to the rescue
+
+Well, it turns out Macwire possesses the notion of https://github.com/adamw/macwire#qualifiers[Qualifiers]. In intent, they
+are identical to JSR 330 qualifiers, the only difference is that they operate on types instead of annotations (since
+Macwire performs its DI based on types).
+
+OK, so we need to qualify our two service dependencies with some sort of tagging types. We _could_ create marker traits for that.
+However, we notice that we:
+
+ - already have two distinct types
+ -  that unambiguously convey our intent.
+
+I'm talking, obviously, about the service types themselves!
+
+OK, so let's tag those config dependencies:
+
+[source,scala]
+.services.scala
+----
+import com.softwaremill.tagging._
+
+class HydroService(val config: ServerConfig @@ HydroService)
+
+class SensorService(val config: ServerConfig @@ SensorService)
+----
+
+Of course, for MacWire to know where to get these dependencies from, we have to tag the config class as well:
+
+[source,scala]
+.AppConfig.scala
+----
+import com.softwaremill.tagging._
+
+class AppConfig(val hydro: ServerConfig @@ HydroService, val sensors: ServerConfig @@ SensorService)
+
+case class ServerConfig(host: String, port: Int)
+----
+
+OK, looks like we're all set. Let's run our app now, aaand:
+
+[source,sbt]
+-----
+[info] Compiling 1 Scala source to target/scala-2.11/classes...
+[error] src/main/scala/Run.scala:20: Cannot generate a config value reader for type
+com.softwaremill.tagging.@@[ServerConfig,HydroService], because value readers cannot be auto-generated for types with type parameters.
+Consider defining your own ValueReader[com.softwaremill.tagging.@@[ServerConfig,HydroService]]
+[error]   lazy val config: AppConfig = rawConfig.as[AppConfig]("app")
+-----
+
+Still no go.
+
+=== Rescuing the tagging
+
+The error message pretty much spells out the problem footnote:[If only more Scala libs took this degree of care with compile-time messages...].
+Since the config instances are now of type `@@[ServerConfig,XService]`, Ficus is unable to find a way to construct
+instances of their types.
+
+Via the error message, we're offered a solution of implementing a `ValueReader`, which is what Ficus depends on when transforming config files into
+  instances. Fortunately, from our previous attempt, we know that Ficus already has `ValueReader` objects in scope capable of generating case classes like `ServerConfig`
+  footnote:[Since the original approach went pass the "Ficus stage" successfully, and only emitted an error during wiring.].
+Additionally:
+
+ - `ValueReader` has a `map` method,
+ - MacWire provides a `taggedWith[TTag]` helper that converts any type `TType` into `@@[TType, TTag]`.
+
+Let's put those pieces together and add our custom reader for tagged types:
+
+[source,scala]
+----
+implicit def taggedReader[TType, TTag](implicit reader: ValueReader[TType]) = reader.map(_.taggedWith[TTag])
+----
+
+After we add the above to run, we should end up with:
+
+[source,sbt]
+----
+> runMain Run
+[info] Compiling 1 Scala source to target/scala-2.11/classes...
+[info] Running Run
+HydroService configured with ServerConfig(hydro.example.com,8215)
+SensorService configured with ServerConfig(sensors.example.com,1777)
+[success] Total time: 2 s, completed 2016-04-30 15:08:12
+----
+
+And we're pretty much done!
+
+One final improvement that we can make is to better convey the relationship between the transformed type and `ValueReader`. We do this
+by using the following equivalent form of our reader:
+
+[source,scala]
+----
+implicit def taggedReader[TType: ValueReader, TTag] = implicitly[ValueReader[TType]].map(_.taggedWith[TTag])
+----
+
+In the end, our app class looks like this:
+
+[source,scala]
+.Run.scala
+----
+import com.softwaremill.macwire._
+import com.softwaremill.tagging._
+import com.typesafe.config.ConfigFactory
+import net.ceedubs.ficus.readers.ValueReader
+
+object Run extends App {
+
+  lazy val rawConfig = ConfigFactory.load()
+
+  import net.ceedubs.ficus.Ficus._
+  import net.ceedubs.ficus.readers.ArbitraryTypeReader._
+
+
+  implicit def taggedReader[TType: ValueReader, TTag] = implicitly[ValueReader[TType]].map(_.taggedWith[TTag])
+
+  lazy val config: AppConfig = rawConfig.as[AppConfig]("app")
+
+  import config._
+
+  lazy val hydroService = wire[HydroService]
+  lazy val sensorService = wire[SensorService]
+
+  println(s"HydroService configured with ${hydroService.config}")
+  println(s"SensorService configured with ${sensorService.config}")
+
+}
+----
+
+== Summary
+
+We've managed to get Macwire and Ficus happily working together to parse HOCON config files, in a type-safe manner.
+
+Note that creating a master config object in larger, multi-module projects, is a Bad Idea™. However, that's not a problem, since
+you can just pass on the "raw" config (from `typesafe-config`) onto the relevant submodules, and have Ficus generate the
+ actual config instances there.
+
+Overall, this approach scales well (architecturally), and requires only the minimal boilerplate necessary for type safety.
+
+You can find the full code example https://github.com/mikolak-net/blog201604ficusmacwire[on GitHub].
