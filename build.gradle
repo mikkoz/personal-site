@@ -16,6 +16,9 @@ buildscript {
 
 apply plugin: 'me.champeau.jbake'
 
+import groovy.json.JsonSlurper
+import groovy.json.JsonParserType
+
 task publish(dependsOn: jbake) << {
 	
 	//TODO: obviously something about Gradle 2.0 config I don't understand
@@ -31,17 +34,15 @@ task publish(dependsOn: jbake) << {
 		name: 'scp',
 		classname: 'org.apache.tools.ant.taskdefs.optional.ssh.Scp',
 		classpath: configurations.antScp.asPath)
-	
-	//TODO: find a generalized way to accessing either the CLI or IDE console
-	def console = System.console()
-	String host = "xn--mikoak-6db.net"
 
-	String user = console.readLine("\nUser: ")
-	def password = console.readPassword("Password: ")
-	int port = Integer.valueOf(console.readLine("Port: "))
-	String uploadPath = console.readLine("Path: ")
+	def jsonSlurper = new JsonSlurper(type: JsonParserType.LAX)
+	def config = jsonSlurper.parse(new File(".config_upload"))
 
-	ant.scp(todir: "$user:$password@$host:$uploadPath", port: port, trust: true) {
+	String host = config.host
+	String user = config.user
+	String uploadPath = config.uploadPath
+
+	ant.scp(todir: "$user@$host:$uploadPath", port: config.port, trust: true, keyfile: config.keyFile) {
 		fileset(dir: 'build/jbake') { include(name: '**') }
 	}
 }
