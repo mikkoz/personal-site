@@ -7,7 +7,7 @@
 	</div>
 	<%published_posts.each {content ->%>
 		<a href="${content.uri}"><h1>${content.title}</h1></a>
-		<p>${content.date.format("dd MMMM yyyy")}</p>
+		<p>${new java.text.SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(content.date)}</p>
 		<p>${content.body}</p>
 		<br/>
 		<script><% /*TODO: currently this is inlinded because content.uri doesn't pass to the incldued template. Make it work.*/ %>
