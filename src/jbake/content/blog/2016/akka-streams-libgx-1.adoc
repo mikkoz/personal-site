@@ -91,9 +91,4 @@ where the problem domain lends toward convergent solution creation.
 
 == Up Next
 
-In the next installment, we're going to cover:
-
- - defining the scope of the PoC game,
- - beginning the integration with a simple event-providing `Source`.
-
-Stay tuned!
+In http://mikołak.net/blog/2016/akka-streams-libgx-2.html[the next installment], we're going to cover defining the scope of the PoC game. Stay tuned!
