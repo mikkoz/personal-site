@@ -1,0 +1,99 @@
+= Reactive Streams in Scala meet a Game Engine - Part 1
+Mikołaj Koziarkiewicz
+2016-09-12
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: blog, general, scala, akka, akka-streams, libgdx, devblog
+:experimental:
+:idprefix:
+
+== Intro
+
+It's always interesting to see a new (or newly fashionable) technique being applied to new and unexpected areas, and
+see whether it makes sense (and what makes or breaks it).
+
+Such is the case with Scala (reactive) streaming and computer game creation. A while ago, I stumbled upon
+https://www.youtube.com/watch?v=B72a1D2xvFs[a talk by Aleksandar Prokopec], which planted the seed of inspiration for
+this blog series. And what set that seed on a path of growth was another presentation, this time by
+http://2016.geecon.org/speakers/info.html?id=131[Michał Płachta]
+footnote:[Source code https://github.com/miciek/snake-multiplayer-akka-streams[here].].
+
+== So, why another thing on this?
+
+Well, of course it wouldn't be fun if the blog series was just a same-scenario rehash. Here's what's going to be different - while
+ the aforementioned talks were more-or-less "from-scratch" affairs, creating a game engine and/or a streaming platform
+ along the way - I will be going the "lazy" route, and attempting to join together a ready-made game engine with
+ a ready-made streaming framework.
+
+The primary advantage of this kind-of-uniquefootnote:[There are at least two similar projects. One went in the direction of https://github.com/jmhofer/activator-libgdx-rxscala[providing] an Rx* translation layer.
+It seems to be inactive for about two years now. https://bitbucket.org/fogone/rxgdx/overview[Another], implemented in Kotlin,
+seems to be under active development. Both use the Rx* family of libraries.] setup is that the focus almost
+by definition falls on the paradigm mismatch problem, and thus it's easy to see what one must solve to make
+the whole shebang work.
+
+And there's a related blessing in disguise - _because_ we're operating between two rigid boundaries of
+stable libraries, any domain-related idiosyncrasies will be easily identifiable, and have a reduced
+chance of rising up later on to bite is in the hind parts.
+
+Now, let's talk framework choices.
+
+== Decisions, decisions
+
+=== Game Engine
+
+It may come as a surprise to some of the readers, but JVM game programming is not exactly a barren
+ field, despite the infamous "Java is slow" stereotype. Probably the greatest influence in recent years
+ has been the rise of Android, hence why a high proportion of JVM game engines provide support for both
+ "mobile" and "desktop" targetsfootnote:[Be aware 'though that since Android supports "native applications",
+ a lot of Android games are written in C/C++ instead.].
+
+In any case, two engines seem to be the strongest contenders at the moment: http://libgdx.badlogicgames.com/[libGDX]
+and http://jmonkeyengine.org/[jMonkeyEngine]. Both have been present on the scene for several years, and offer
+comprehensive game development feature setsfootnote:[To answer a - perhaps - lingering question: Minecraft, the poster
+child of JVM games, uses neither. It has a proprietary engine, with several native bridges for OpenGL support etc.].
+
+The choice, however, falls on libGDX, for two reasons: it has explicit support for 2D rendering, and
+it's the one I'm actually familiar with.
+
+I'm going to expand on libGDX in upcoming installments. Right now, let's roll over to the other side for the...
+
+=== Streaming Implementation
+
+Apart from the obvious choice of Akka Streams, I was also monitoring the progress of https://github.com/sirthias/swave/[Swave].
+
+I recommend following its development closely. It is, in implementation and design, significantly less complex than Akka Streams.
+ Swave can therefore serve as a convenient stepping stone in beating the learning curve, when adapting to the streaming paradigm.
+
+However, Swave is still shaping up, its documentation is somewhat lackingfootnote:[Do see
+https://github.com/sirthias/swave#resources[the presentations] 'though for a good feel of what it offers.], and I
+have a sneaking suspicion that some unique features of its "competitor" (like blueprinting) might come in handy, so we're
+sticking with Akka Streams.
+
+OK, so the tech base is decided now. All that remains is one tiny detail - just what is the end goal and how to achieve it?
+
+== Some ground rules
+
+Let's start with the goal itself, since it's pretty obvious - a natural way to verify whether something works (or doesn't),
+is through a practical proof-of-concept. Therefore, during this series, I'm going to work towards a fully-playable simple game,
+that uses streaming as its core operational model.
+
+This leads nicely to the preferred form of the series, i.e. a development blog - meaning:
+
+ - installments will be posted (hopefully) regularly,
+ - with a soft word-length cutoff,
+ - mistakes will be made prominent (and prominently made), including potentially avoidable ones, in
+ order to showcase them and their solutionsfootnote:[Also making for a nice excuse in case of eggregious blunders.].
+
+Finally, to spice things up a bit, I'm going to deliberately forgo gathering "technical" inspiration from the
+aforementioned related talks and projects (like the additional abstractions introduced by Dr. Prokopec), in order to see
+where the problem domain lends toward convergent solution creation.
+
+
+== Up Next
+
+In the next installment, we're going to cover:
+
+ - defining the scope of the PoC game,
+ - beginning the integration with a simple event-providing `Source`.
+
+Stay tuned!
