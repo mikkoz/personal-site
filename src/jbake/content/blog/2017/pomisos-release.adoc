@@ -1,0 +1,71 @@
+= Pomisos released!
+Mikołaj Koziarkiewicz
+2017-03-28
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: scala, javafx, java, app
+:experimental:
+:idprefix:
+
+== What?
+
+As I alluded to https://mikołak.net/blog/2016/akka-streams-libgx-2.html[earlier], my free time (or
+at least the portion dedicated to coding) was recently taken up by a specific project. That project
+has been finally released: say hello to https://github.com/mikolak-net/pomisos[pomisos].
+
+Pomisos is a desktop productivity app that helps users with elements of the Pomodoro Technique, specifically
+automating distraction removal (e.g. e-mail clients). There's more info on the https://github.com/mikolak-net/pomisos#what-is-it[project page],
+what I'm going to concentrate on here are several thoughts that came up during the app's development.
+
+=== JavaFX is surprisingly ahead of its time
+
+While the previous "official" Java desktop GUI framework, Swing, was based on the Publisher-Observer pattern,
+ JavaFX is instead oriented around https://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/Property.html[Properties].
+
+Although superficially similar (they also allow listeners to be added), the crucial difference is the concept
+of "binding" properties to one another, essentially synchronizing them automatically. This allows for
+ essentially writing GUI logic like a set of logic rules, e.g. (pseudocode) :
+
+`managePane.visible.bind(option.selected)`
+
+where `visible` and `selected` are both of type `BooleanProperty`. What's more, you can bind multiple properties into complex statements, which essentially allows you to
+create dataflows that are updated automatically.
+
+Essentially, the logic starts to look like a declarative
+stream specification, much more maintainable and convenient than the "Listener Hell" of Swing.
+It's a shame JavaFX arrived only when classic desktop apps have already started to go out of fashion.
+
+=== There's comprehensive support for JavaFX in Scala
+
+If you do want to start developing JavaFX applications, however, there's several libraries that allow to comfortably code using Scala.
+
+The first one, of course, is http://www.scalafx.org/[scalafx], which simply "Scalifies" the API, and adds a convenient DSL for property bindings.
+The previous example would now look like:
+
+`managePane.visible <== option.selected`
+
+Even more rule-like!
+
+Another thing is FXML development. FXML works pretty much like e.g. Android's UI XML files - it allows you to separate
+general UI specification (the XML) from your business-logic code (a `Controller` class).
+
+To take advantage of that convenience in Scala, there's https://github.com/vigoo/scalafxml[scalafxml]. What's especially nice is that integrates Scala
+DI approaches (like Macwire), to automatically instantiate the `Controller` classesfootnote:[There's one problem - the DI for those classes is handled at runtime.].
+
+=== Relaxed approach to development is the way to go when prototyping
+
+From my observations, it appears there's a persistent myth that experienced developers somehow create perfect code instantly - like some
+sort of rainbow-excreting unicorns. I find that exceedingly harmful, since it effectively reduces the amount of code that gets out to the public,
+due to lowered self-esteem of aspiring devs.
+
+By the way, one of the best things in _Clean Code_ is the part where Uncle Bob shows the continuous process of implementing a simple example, starting
+ from a very messy prototype.
+
+This is exactly why I haven't squashed the ongoing commits. I think it's a good idea for there to be more transparency in development
+of similar-scale projects, exactly because of the learning potential in demonstrating the actual coding process.
+
+== Coming up
+
+That's all regarding the development of https://github.com/mikolak-net/pomisos[pomisos]. Check out the project if you're interested.
+
+Next time, we'll go back to streaming and game development!
