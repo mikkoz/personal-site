@@ -17,7 +17,7 @@ Pomisos is a desktop productivity app that helps users with elements of the Pomo
 automating distraction removal (e.g. e-mail clients). There's more info on the https://github.com/mikolak-net/pomisos#what-is-it[project page],
 what I'm going to concentrate on here are several thoughts that came up during the app's development.
 
-=== JavaFX is surprisingly ahead of its time
+=== JavaFX is/was surprisingly ahead of its time
 
 While the previous "official" Java desktop GUI framework, Swing, was based on the Publisher-Observer pattern,
  JavaFX is instead oriented around https://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/Property.html[Properties].
@@ -26,7 +26,10 @@ Although superficially similar (they also allow listeners to be added), the cruc
 of "binding" properties to one another, essentially synchronizing them automatically. This allows for
  essentially writing GUI logic like a set of logic rules, e.g. (pseudocode) :
 
-`managePane.visible.bind(option.selected)`
+[source,scala]
+----
+managePane.visible.bind(option.selected)
+----
 
 where `visible` and `selected` are both of type `BooleanProperty`. What's more, you can bind multiple properties into complex statements, which essentially allows you to
 create dataflows that are updated automatically.
@@ -42,15 +45,38 @@ If you do want to start developing JavaFX applications, however, there's several
 The first one, of course, is http://www.scalafx.org/[scalafx], which simply "Scalifies" the API, and adds a convenient DSL for property bindings.
 The previous example would now look like:
 
-`managePane.visible <== option.selected`
+[source,scala]
+----
+managePane.visible <== option.selected
+----
 
-Even more rule-like!
+Even more rule-likefootnote:[Although, to be honest, I'm not a fan of the http://www.scalafx.org/docs/properties/[other parts of the DSL],
+as I find "plain" `map`/`flatMap` combinators would be a much better fit here, instead of a tailor-made DSL.]!
 
 Another thing is FXML development. FXML works pretty much like e.g. Android's UI XML files - it allows you to separate
 general UI specification (the XML) from your business-logic code (a `Controller` class).
 
 To take advantage of that convenience in Scala, there's https://github.com/vigoo/scalafxml[scalafxml]. What's especially nice is that integrates Scala
 DI approaches (like Macwire), to automatically instantiate the `Controller` classesfootnote:[There's one problem - the DI for those classes is handled at runtime.].
+
+=== Gremlin-based Graph DBs are too involved for simple projects
+
+Over the last year or so, I've been evaluating https://tinkerpop.apache.org/[Gremlin/TinkerPop], specifically the
+https://github.com/mpollmeier/gremlin-scala[Scala implementation], in a variety of projects. Out of curiosity, I went with it as the DB layer for pomisos,
+using an embedded OrientDB instance as the storage implementation.
+
+Unfortunatelyfootnote:[...and as I expected...], while the API Gremlin API is almost amazingly intuitive (and the
+Scala implementation doubly so, big kudos to https://github.com/mpollmeier[Michael Pollmeier] for his work here), I found the
+"constant" cost of introducing this kind of abstraction seems to be an overkill for projects with only several, unconected,
+entity types.
+
+Specifically, the biggest problem was creating generalized DAOs, and attempting to use edges as an _Ersatz_ for
+ trivial relations.
+
+To be clear though: in this case, the aforementioned cost of introduction is comparable to an RDBMs. It's just that, for projects
+ of scale comparable to pomisos, simple object stores are more than sufficient.
+
+
 
 === Relaxed approach to development is the way to go when prototyping
 
