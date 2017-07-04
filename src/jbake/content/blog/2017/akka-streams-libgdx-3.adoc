@@ -1,0 +1,212 @@
+= Reactive Streams in Scala meet a Game Engine - Part 3
+Mikołaj Koziarkiewicz
+2017-07-05
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: blog, general, scala, akka, akka-streams, libgdx, devblog
+:experimental:
+:imagesdir: {jbake_url_illustrations}/stream-game/
+:idprefix:
+
+
+== In this episode...
+
+...we will start the actual development of the game by planting some boilerplate, taking a crash course
+in libgdx, and setting the stage for the actual streaming implementation.
+
+== Libgdx Basics
+
+=== Project Structure
+
+http://libgdx.badlogicgames.com/[Libgdx], as mentioned previously, is a popular JVM framework for game design. Rudimentary
+Scala support exists - in fact, our game skeleton is based on https://github.com/ajhager/libgdx-sbt-project.g8[ajhager's g8 template],
+or rather, https://github.com/Darkyenus/libgdx-sbt-project.g8[its fork by Darkyenus].
+
+Because libgdx is a multi-platform engine, projects using it are always multi-module,
+split into:
+
+* a `core` module that contains the generic base of the game,
+* one or modules, each for a different target's specific code, e.g. `desktop`, `android`, `ios`, etc.
+
+In our case we will be only implementing a desktop version, so we will have two modules:
+`core`, and `desktop`.
+
+=== Boilerplate classes
+
+The `core` 's structures starts with the primary entrypoint class - a subclass of `Game`. Each platform
+variant creates an instance of this class during initialization.
+
+In turn a `Game` operates on a number of `Screen` s, exactly one of each
+is always active. The `Screen` subclasses usually contain most of the game's
+logic, the `Game` subclass should only provide minimal global controller "glue".
+
+Both `Game` and `Screen` are coded in by implementing the provided lifecycle methods,
+`create`, `pause`, `resume`, `dispose` etc. footnote:[This factory-method-based approach to lifecycle management is quite widespread, and used most prominently in the JVM world by the Android ecosystem].
+
+With the general introduction out of the way, let's see how a minimal game
+looks like. Here's the `core` logic:
+
+[source,scala]
+----
+package net.mikolak.stream_bullethell
+
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.{Game, Gdx, ScreenAdapter}
+
+class BulletHell extends Game {
+
+  override def create(): Unit = { // <1>
+    setScreen(new MainScreen) // <2>
+  }
+
+}
+
+class MainScreen extends ScreenAdapter { <3>
+
+  override def render(delta: Float) = {
+    Gdx.gl.glClearColor(0, 0, 0.5f, 1) // <4>
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+  }
+
+}
+----
+<1> Overriding a lifecycle method here.
+<2> Setting the active screen to our implementation.
+<3> Using an abstract _Adapter_ class instead of the actual `Screen` interface for convenience.
+<4> Painting the background color to dark blue.
+
+We then define a platform specific implementation, in this case,
+a "desktop"footnote:[In the "personal computer" sense: anything running on an i386/amd64 architecture or similar.] JRE target:
+
+[source,scala]
+-----
+package net.mikolak.stream_bullethell
+
+import com.badlogic.gdx.backends.lwjgl.{LwjglApplication, LwjglApplicationConfiguration} // <1>
+
+object Main extends App {
+    val cfg = new LwjglApplicationConfiguration
+    cfg.title = "stream-bullethell-demo"
+    cfg.height = 480
+    cfg.width = 800
+    cfg.forceExit = false
+    new LwjglApplication(new BulletHell, cfg) <2>
+}
+-----
+<1> "Desktop"-specific imports.
+<2> Pointing to our `Game` subclass.
+
+This leaves us with an 800px by 480px screen with a dark blue background.
+
+== Erecting a base camp
+
+The previous listing doesn't leave us much room for experiment, so let's
+spice things up a little by adding a proper Hello World message to `MainScreen`:
+
+[source,scala]
+----
+class MainScreen extends ScreenAdapter {
+
+  private lazy val camera = new OrthographicCamera() // <1>
+  private val batch: SpriteBatch = new SpriteBatch() // <2>
+
+  private lazy val font = {
+    val f = new BitmapFont()
+    f.getData.setScale(2f)
+    f
+  } // <3>
+
+  override def show() = {
+    camera.setToOrtho(false, 800, 480) <4>
+  }
+
+  override def render(delta: Float) = {
+    Gdx.gl.glClearColor(0, 0, 0.5f, 1)
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+    camera.update()
+    batch.setProjectionMatrix(camera.combined) <5>
+    batch.begin() <6>
+    font.draw(batch, "Hello libgdx!", 0, font.getCapHeight) <7>
+    batch.end()
+  }
+
+}
+----
+<1> The camera defines how the player "looks" at the object on the scene.
+ In this case, we are using an Orthographic camera, which means we're looking
+ at the scene "straight down" (representing a 2D game - libgdx is also capable of 3D).
+<2> A `SpriteBatch` lets us draw multiple objects in one pass. Due to how actual
+games have a lot of objects on screen, using a `SpriteBatch` instance is the standard way
+of presenting _anything_ on screen in libgdx.
+<3> Fonts, like many other resources, are explicitly declared for efficiency's sake. This
+will give us a "default" font.
+<4> Once the screen becomes visible, the camera is set to show a top-down view
+of a rectangle of `[0, 0, 800, 480]` - since this is the same area as the "desktop"
+target's window, each scene point corresponds to a single pixel.
+<5> The `SpriteBatch` is ordered to present the same viewport as the camera.
+<6> A batch must be always explicitly begun and ended. Objects are queued for drawing with it in between
+those two points.
+<7> Here's where we actually draw the text. The X coordinate corresponds to the far-left
+side of the screen, and the Y coordinate corresponds to the bottom of the screen _plus_ the capital-character height
+of glyphs of our font.
+
+This nets us an actual Hello World, but we still have nothing to work on.
+
+== Tick tick tick tick
+
+`Screen` s in libgdx are updated once per an interval called a _tick_. For each tick,
+the `render` method is called, and only once it's complete can another tick occurfootnote:[In other words, the `render` method is guaranteed to be called at most once simultaneously - similarly to how `receive` works for Akka actors. This is also how most JVM GUI engines operate.].
+This means all your game's logic other than (de)initialization should be called from `render`, and - ideally - run in the same thread.
+
+Due to machine-specific issues or issues with the game logic itself footnote:[As corollary to the above, sluggish game logic in the `render` implementation causes the subsequent call to be delayed.], the length of time
+each tick can take is not constant - this is why the `delta` parameter is provided, giving the millisecond amount between current an
+previous ticks.
+
+As you have probably figured out by now, we're going to need to tap into the tick mechanism to get started. So, let's end this installment
+by printing up subsequent ticks. Here's how our `MainScreen` will look now:
+
+[source,scala]
+----
+class MainScreen extends ScreenAdapter {
+
+  lazy val camera = new OrthographicCamera()
+  val batch: SpriteBatch = new SpriteBatch()
+
+  var tick = 1L
+
+  lazy val font = {
+    val f = new BitmapFont()
+    f.getData.setScale(2f)
+    f
+  }
+
+  override def render(delta: Float) = {
+    tick += 1 <1>
+
+    //print tick
+    Gdx.gl.glClearColor(0, 0, 0.5f, 1)
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+    camera.update()
+    batch.setProjectionMatrix(camera.combined)
+    batch.begin()
+    font.draw(batch, s"Tick: $tick", 0, font.getCapHeight) <2>
+    batch.end()
+  }
+
+  override def show() = {
+    camera.setToOrtho(false, 800, 480)
+  }
+}
+----
+<1> Setting the tick number...
+<2> ...and printing it out.
+
+You can grab the source code of the entire project in this state https://github.com/mikolak-net/scala-stream-bullet-hell/tree/6e0b52470bff5ad884e97a955104a70a65f887df[here].
+Libgdx itself has very comprehehsive documentation, so if you wish to find out more about it,
+https://github.com/libgdx/libgdx/wiki[its wiki is a good place to start].
+
+== Next up
+
+Now we finally have a starting point for actual development of our concept.
+In the next installment, which will follow very shortly, we'll get on to do that - specifically, by creating a simple
+stream that is able to tap into the tick mechanism of libgdx's engine.
