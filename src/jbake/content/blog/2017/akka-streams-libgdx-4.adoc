@@ -1,0 +1,248 @@
+= Reactive Streams in Scala meet a Game Engine - Part 4
+Mikołaj Koziarkiewicz
+2017-07-07
+:jbake-type: post
+:jbake-status: draft
+:jbake-tags: blog, general, scala, akka, akka-streams, libgdx, devblog
+:experimental:
+:imagesdir: {jbake_url_illustrations}/stream-game/
+:githubprefix: https://github.com/mikolak-net/scala-stream-bullet-hell/tree
+:idprefix:
+
+
+== In this episode...
+
+...we're finally ready to add Akka Streams code to our setup, by implementing the heart of our game logic stream - the
+tick `Source`.
+
+include::{jbake_blog_insets_path}akka-streams-libgdx/rules-frame.adoc[]
+
+== Scouting out the solution space
+
+Let's define our core problem first - we need to somehow transfer the information
+about each incoming tick into a stream materialization. The first order of business is to find a way
+a way to inject that information into the stream.
+
+It's probably tempting to create a custom publisher-listener solution for that, but
+we would wind up reinventing the wheel this way. Instead, let's look whether we can find out
+how the Akka Streams' API deals with the problem.
+
+As a matter of fact, there is a
+link:++http://doc.akka.io/api/akka/current/akka/stream/scaladsl/Source$.html#tick[T](initialDelay:scala.concurrent.duration.FiniteDuration,interval:scala.concurrent.duration.FiniteDuration,tick:T):akka.stream.scaladsl.Source[T,akka.actor.Cancellable]^++[`Source.tick`^] factory method
+that handles a similar scenario. However, the ticks here are generated internally, so it's of no use for us.
+
+However, we see that two other useful factory methods exist:
+
+* link:++http://doc.akka.io/api/akka/current/akka/stream/scaladsl/Source$.html#actorPublisher[T](props:akka.actor.Props):akka.stream.scaladsl.Source[T,akka.actor.ActorRef]++[`Source.actorPublisher`^]
+* link:++http://doc.akka.io/api/akka/current/akka/stream/scaladsl/Source$.html#actorRef[T](bufferSize:Int,overflowStrategy:akka.stream.OverflowStrategy):akka.stream.scaladsl.Source[T,akka.actor.ActorRef]++[`Source.actorRef`^]
+
+Both provide us with an `ActorRef` that we can use to pump ticks into our stream.
+
+We're going to investigate both to see whether they help us solve our problem, but first, let's...
+
+=== Setup
+
+First of all, that `Float` for the tick delta time looks ungainly, so we'll introduce a package object to deal with that:
+
+[source,scala]
+.stream_bullethell/package.scala
+----
+package net.mikolak
+
+package object stream_bullethell {
+  type TickDelta = Float
+}
+----
+
+
+Next, let's create a framework for our stream - we're going to be printing ticks from our stream now:
+
+[source,scala]
+----
+class MainScreen extends ScreenAdapter {
+
+  lazy val camera = new OrthographicCamera()
+  val batch: SpriteBatch = new SpriteBatch()
+
+  var tick = 1L
+
+  implicit val actorSystem = ActorSystem("game")
+  implicit val materializer = ActorMaterializer() <1>
+
+  val tickSource: Source[Nothing, ActorRef] = ??? <3>
+  var tickActor: Option[ActorRef] = None <4>
+
+  lazy val font = {
+    val f = new BitmapFont()
+    f.getData.setScale(2f)
+    f
+  }
+
+  override def show() = {
+    camera.setToOrtho(false, 800, 480)
+
+    val tickSettingFlow = Flow[TickDelta].map { td =>
+      tick += 1
+      td
+    } <5>
+    val graph = tickSource.via(tickSettingFlow).to(Sink.ignore) <6>
+
+    tickActor = Some(graph.run()) <7>
+  }
+
+  override def render(delta: TickDelta) = {
+    tickActor.foreach(_ ! delta) <8>
+
+    //print tick
+    Gdx.gl.glClearColor(0, 0, 0.5f, 1)
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+    camera.update()
+    batch.setProjectionMatrix(camera.combined)
+    batch.begin()
+    font.draw(batch, s"Tick: $tick", 0, font.getCapHeight)
+    batch.end()
+  }
+
+  override def dispose(): Unit = {
+    actorSystem.terminate() <2>
+  }
+}
+----
+<1> Standard initialization song-and-dance.
+<2> Deinit here footnote:[This is actually incorrect, but the error is not critical for our purposes.].
+<3> Placeholder for our `Source`, note the materialized value type (`ActorRef`).
+<4> Placeholder for the materialized value.
+<5> Defining a simple `Flow` that increments the `tick` value from the Stream level, and passing the `TimeDelta` value through.
+<6> Connecting all parts...
+<7> ...and materializing the graph with `run`.
+<8> Here's where we communicate the occurrence of a tick with the stream.
+
+The concept is straightforward: we're using a http://doc.akka.io/docs/akka/current/scala/stream/stream-composition.html#materialized-values[materialized value^] (an `ActorRef`) to ping the source
+with a tick delta time every time a tick occurs.
+
+[NOTE]
+====
+What's important to be aware here is that, in Akka Streams, the value materialized from running footnote:[*also* confusingly called "materializing"....]
+a graph is not only used to get some output out of it, but can also be used to
+provide input _into_ it. This is what we are doing here - once the graph is ran,
+the `ActorRef` we get as the result serves as our "messenger" between our libgdx code and the
+Akka Stream graph.
+====
+
+You can play around with the source code for this stage {githubprefix}/8a386d516535df51be8ff3920f09c743d334df21[here^].
+
+=== `Source.actorPublisher`
+
+To use this method, we need to implement an actor with an `ActorPublisher` trait.
+
+Basically, we need to create a simple queue implementation that pushes new items
+using `onNext`, whenever there is demand downstream. Here's how the implementation might look like:
+
+[source,scala]
+----
+class GameTickPublisherActor() extends Actor with ActorPublisher[TickDelta] {
+
+  private var updateStack = List.empty[TickDelta]
+
+  override def receive = {
+    case delta: TickDelta =>
+      updateStack :+= delta <1>
+
+      if (isActive && totalDemand > 0) { <2>
+        val (toTransmit, toPreserve) =
+          updateStack.splitAt((updateStack.length - totalDemand.toInt).max(0))
+        toTransmit.foreach(onNext) <3>
+        updateStack = toPreserve
+      }
+  }
+}
+----
+<1> Adding to our element queue.
+<2> Checking whether we should push something downstream.
+<3> Transmitting `totalDemand` elements to the upstream.
+
+(Note that `onNext`, `isActive` and `totalDemand` are all references introduced by the `ActorPublisher` trait)
+
+Then, all we need to do is fill out our `Source` placeholder in `MainScreen`:
+
+[source,scala]
+----
+  val tickSource: Source[Nothing, ActorRef] = Source.actorPublisher(Props[GameTickPublisherActor])
+----
+
+{githubprefix}/1b9e74efa6f4f9eb3331fdcc7c657971da93d4da[Here's the source code for this implementation^].
+
+And we're getting our ticks:
+
+video::source-actorpublisher.mp4[width=852,options="autoplay,nocontrols,loop"]
+
+At first glance, it looks like it's working, although not completely smoothly. Let's try out the other approach.
+
+
+=== `Source.actorRef`
+
+This one's even simpler, all we have to do is set up the source:
+
+[source,scala]
+----
+   val tickSource = Source.actorRef[TickDelta](0, OverflowStrategy.fail)
+----
+
+`actorRef` requires two parameters:
+
+* `bufferSize` - which we set to `0` to disable the buffer,
+* `overflowStrategy` - does not actually matter, since buffer is disabled.
+
+Here's how our tick demonstrator runs now:
+
+video::source-actorref.mp4[width=852,options="autoplay,nocontrols,loop"]
+
+And {githubprefix}/2e1459af1d56d8bea7e6f43fc3f7d84b11f28a98[here's the source code^].
+
+We can now plainly see that the `actorPublisher` version fails to produce values expediently, compared to
+the variant currently discussed. Why is this the case?
+
+=== Keeping things simple
+
+Obviously there's a problem somewhere with the first implementation, but where?
+Let's start with logging `toTransmit` on every tick. It turns out we will get something like:
+
+[source,scala]
+----
+List()
+List()
+List()
+List()
+List()
+List(0.01748508)
+List(0.016564002, 0.015894385)
+List(0.017008292, 0.017062303, 0.015971143)
+List(0.01700024, 0.01696568, 0.016022582, 0.01697306)
+----
+
+This is obviously incorrect, since we should always check for a positive demand (and therefore
+should be sending non-empty lists).
+
+Of course, this implies we have the third member of the unholy duo of programming mistakes, namely
+an off-by-one error. Specifically, here:
+
+[source,scala]
+-----
+          updateStack.splitAt((updateStack.length - totalDemand.toInt).max(0))
+-----
+
+we `max` to `0` instead of `1`. Correcting the line to `max(1)` will make both implementations run smoothly.
+
+Moreover, seeing as how the `actorPublisher` implementation has no advantage over
+the `actorRef` one, and is substantially more convoluted, we'll be sticking with the latter.
+
+== Up next
+
+We now have a tick source, so we will be able to liven our game's world
+a little by adding some entities mulling about.
+
+Also, we have completely neglected thread safety up until now - we've been
+updating the game state (in this case, the `tick` var) from at least
+two different threads. We'll be working towards eliminating this kludge as well.
+
+Stay tuned!
