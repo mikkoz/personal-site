@@ -1,0 +1,7 @@
+We would like to have a game that:
+
+ - requires relatively quick player reaction (so e.g. no turn-based games),
+ - has a lot of events happening at any given moment,
+ - and employs a large number of entities to do so.
+
+Recall also one of our initial assumptions: mistakes will be made prominent (and prominently made), including potentially avoidable ones, in order to showcase them and their solutions.

@@ -22,11 +22,9 @@ Another issue is smooth rendering of the game's updates. Enjoyment drops sharply
 
 A related problem is responsiveness to player input. Smooth FPS gives little consolation if the player remains constantly frustrated while unable to react in time to the unfolding events.
 
-To sum up, we would like to have a game that:
+To sum up...
 
- - requires relatively quick player reaction (so e.g. no turn-based games),
- - has a lot of events happening at any given moment,
- - and employs a large number of entities to do so.
+include::{jbake_blog_insets_path}akka-streams-libgdx/rules.adoc[]
 
 === First sketches
 

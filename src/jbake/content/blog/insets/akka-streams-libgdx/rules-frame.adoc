@@ -1,0 +1,6 @@
+[IMPORTANT]
+====
+As a reminder...
+
+include::rules.adoc[]
+====
