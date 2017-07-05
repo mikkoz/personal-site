@@ -2,40 +2,43 @@ buildscript {
 	configurations {
 		antScp
 	}
-	
+
 	repositories {
 		mavenCentral()
 		jcenter()
 	}
 
-	dependencies {
-		classpath 'me.champeau.gradle:jbake-gradle-plugin:0.2'
- 		classpath 'org.jbake:jbake-core:2.5.1'
-		classpath 'org.asciidoctor:asciidoctorj:1.5.4'
-	}
 }
 
-apply plugin: 'me.champeau.jbake'
+plugins {
+	id 'org.jbake.site' version '1.0.0'
+}
+
+jbake {
+	version  = '2.5.1'
+	srcDirName  = 'src/jbake'
+	destDirName = 'jbake'
+}
 
 import groovy.json.JsonSlurper
 import groovy.json.JsonParserType
 
 
-task publish(dependsOn: jbake) << {
-	
+task publish(dependsOn: bake) << {
+
 	//TODO: obviously something about Gradle 2.0 config I don't understand
 	repositories {
 		mavenCentral()
 	}
-	
+
 	dependencies {
 		antScp 'com.jcraft:jsch:0.1.50','org.apache.ant:ant-jsch:1.9.3'
 	}
-	
+
 	ant.taskdef(
-		name: 'scp',
-		classname: 'org.apache.tools.ant.taskdefs.optional.ssh.Scp',
-		classpath: configurations.antScp.asPath)
+			name: 'scp',
+			classname: 'org.apache.tools.ant.taskdefs.optional.ssh.Scp',
+			classpath: configurations.antScp.asPath)
 
 	def jsonSlurper = new JsonSlurper(type: JsonParserType.LAX)
 	def config = jsonSlurper.parse(new File(".config_upload"))
