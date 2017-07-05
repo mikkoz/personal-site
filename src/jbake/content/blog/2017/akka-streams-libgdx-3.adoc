@@ -18,9 +18,9 @@ in libgdx, and setting the stage for the actual streaming implementation.
 
 === Project Structure
 
-http://libgdx.badlogicgames.com/[Libgdx], as mentioned previously, is a popular JVM framework for game design. Rudimentary
-Scala support exists - in fact, our game skeleton is based on https://github.com/ajhager/libgdx-sbt-project.g8[ajhager's g8 template],
-or rather, https://github.com/Darkyenus/libgdx-sbt-project.g8[its fork by Darkyenus].
+http://libgdx.badlogicgames.com/[Libgdx^], as mentioned previously, is a popular JVM framework for game design. Rudimentary
+Scala support exists - in fact, our game skeleton is based on https://github.com/ajhager/libgdx-sbt-project.g8[ajhager's g8 template^],
+or rather, https://github.com/Darkyenus/libgdx-sbt-project.g8[its fork by Darkyenus^].
 
 Because libgdx is a multi-platform engine, projects using it are always multi-module,
 split into:
@@ -201,9 +201,9 @@ class MainScreen extends ScreenAdapter {
 <1> Setting the tick number...
 <2> ...and printing it out.
 
-You can grab the source code of the entire project in this state https://github.com/mikolak-net/scala-stream-bullet-hell/tree/6e0b52470bff5ad884e97a955104a70a65f887df[here].
+You can grab the source code of the entire project in this state https://github.com/mikolak-net/scala-stream-bullet-hell/tree/6e0b52470bff5ad884e97a955104a70a65f887df[here^].
 Libgdx itself has very comprehehsive documentation, so if you wish to find out more about it,
-https://github.com/libgdx/libgdx/wiki[its wiki is a good place to start].
+https://github.com/libgdx/libgdx/wiki[its wiki is a good place to start^].
 
 == Next up
 
