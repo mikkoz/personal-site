@@ -185,19 +185,19 @@ This one's even simpler, all we have to do is set up the source:
 
 [source,scala]
 ----
-   val tickSource = Source.actorRef[TickDelta](0, OverflowStrategy.fail)
+   val tickSource = Source.actorRef[TickDelta](0, OverflowStrategy.dropNew)
 ----
 
 `actorRef` requires two parameters:
 
 * `bufferSize` - which we set to `0` to disable the buffer,
-* `overflowStrategy` - does not actually matter, since buffer is disabled.
+* `overflowStrategy` - does not actually matter, since buffer is disabled - although `dropNew` is basically the implementation's behavior in this case.
 
 Here's how our tick demonstrator runs now:
 
 video::source-actorref.mp4[width=852,options="autoplay,nocontrols,loop"]
 
-And {githubprefix}/2e1459af1d56d8bea7e6f43fc3f7d84b11f28a98[here's the source code^].
+And {githubprefix}/bca4fcd740c0b86af0a07c6e49611b3c67118ab4[here's the source code^].
 
 We can now plainly see that the `actorPublisher` version fails to produce values expediently, compared to
 the variant currently discussed. Why is this the case?
