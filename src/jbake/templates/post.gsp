@@ -13,7 +13,7 @@
 	<p>
 		<%include "comments.gsp" %>
 		<span id="IDCommentsPostTitle" style="display:none"></span>
-		<script type='text/javascript' src='http://www.intensedebate.com/js/genericCommentWrapperV2.js'></script>
+		<script type='text/javascript' src='https://www.intensedebate.com/js/genericCommentWrapperV2.js'></script>
 	</p>
 
 	<hr />

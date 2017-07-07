@@ -15,7 +15,7 @@
 			var idcomments_post_id = "${config.site_host}/${content.uri}";
 			var idcomments_post_url = idcomments_post_id;
 			</script>
-			<script type="text/javascript" src="http://www.intensedebate.com/js/genericLinkWrapperV2.js"></script>
+			<script type="text/javascript" src="https://www.intensedebate.com/js/genericLinkWrapperV2.js"></script>
   	<%}%>
 	
 	<hr />
