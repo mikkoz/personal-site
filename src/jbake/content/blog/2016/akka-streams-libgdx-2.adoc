@@ -8,6 +8,8 @@ Mikołaj Koziarkiewicz
 :imagesdir: {jbake_url_illustrations}/stream-game/
 :idprefix:
 
+include::{jbake_blog_insets_path}akka-streams-libgdx/toc.adoc[]
+
 Unfortunately, just after http://mikołak.net/blog/2016/akka-streams-libgx-1.html[the first installment of this series], I've involved myself in another side-project, which will probably be released soon. But hey, that's no excuse to at least make a small update in the meantime, to keep the ball rolling, right?
 
 == Scope

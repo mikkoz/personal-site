@@ -7,6 +7,8 @@ Mikołaj Koziarkiewicz
 :experimental:
 :idprefix:
 
+include::{jbake_blog_insets_path}akka-streams-libgdx/toc.adoc[]
+
 == Intro
 
 It's always interesting to see a new (or newly fashionable) technique being applied to new and unexpected areas, and

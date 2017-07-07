@@ -8,6 +8,7 @@ Mikołaj Koziarkiewicz
 :imagesdir: {jbake_url_illustrations}/stream-game/
 :idprefix:
 
+include::{jbake_blog_insets_path}akka-streams-libgdx/toc.adoc[]
 
 == In this episode...
 

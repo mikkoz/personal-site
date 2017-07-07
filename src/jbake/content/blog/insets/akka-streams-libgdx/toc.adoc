@@ -1,0 +1,7 @@
+== Series' Table of Contents
+:article-prefix: akka-streams-libgdx-
+
+* <<../2016/{article-prefix}1.adoc#,Part {counter:part_num} - Introduction>>
+* <<../2016/{article-prefix}2.adoc#,Part {counter:part_num} - Defining Requirements>>
+* <<../2017/{article-prefix}3.adoc#,Part {counter:part_num} - Setting Up the Project>>
+* <<../2017/{article-prefix}4.adoc#,Part {counter:part_num} - Coding the Tick Source>>

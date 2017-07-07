@@ -9,6 +9,7 @@ Mikołaj Koziarkiewicz
 :githubprefix: https://github.com/mikolak-net/scala-stream-bullet-hell/tree
 :idprefix:
 
+include::{jbake_blog_insets_path}akka-streams-libgdx/toc.adoc[]
 
 == In this episode...
 
