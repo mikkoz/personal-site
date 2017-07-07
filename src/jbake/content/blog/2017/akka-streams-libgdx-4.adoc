@@ -2,7 +2,7 @@
 Mikołaj Koziarkiewicz
 2017-07-07
 :jbake-type: post
-:jbake-status: draft
+:jbake-status: published
 :jbake-tags: blog, general, scala, akka, akka-streams, libgdx, devblog
 :experimental:
 :imagesdir: {jbake_url_illustrations}/stream-game/
@@ -20,8 +20,9 @@ include::{jbake_blog_insets_path}akka-streams-libgdx/rules-frame.adoc[]
 == Scouting out the solution space
 
 Let's define our core problem first - we need to somehow transfer the information
-about each incoming tick into a stream materialization. The first order of business is to find a way
-a way to inject that information into the stream.
+about each incoming tick into our stream. The first order of business is to find a way
+to inject that information into the stream.
+
 
 It's probably tempting to create a custom publisher-listener solution for that, but
 we would wind up reinventing the wheel this way. Instead, let's look whether we can find out
@@ -37,6 +38,20 @@ However, we see that two other useful factory methods exist:
 * link:++http://doc.akka.io/api/akka/current/akka/stream/scaladsl/Source$.html#actorRef[T](bufferSize:Int,overflowStrategy:akka.stream.OverflowStrategy):akka.stream.scaladsl.Source[T,akka.actor.ActorRef]++[`Source.actorRef`^]
 
 Both provide us with an `ActorRef` that we can use to pump ticks into our stream.
+
+[NOTE]
+====
+Recall: in Akka Streams, running
+a graph can return a non-unit value - this is called the _materialized value_ of a graph footnote:[Confusingly, running a graph is *also* called "materializing" it...].
+
+Usually, the materialized value is used to get some "result" out from running the graph. However, what's important to remember is that
+*any* graph stage can generate a materialized value, not only a `Sink`.
+
+In fact, it is almost equally frequent to use a materialized value not only to get some output out of the graph, but
+also provide input _into_ it footnote:[You can do either, or both at the same time - consult http://doc.akka.io/docs/akka/current/scala/stream/stream-composition.html#materialized-values[the documentation^] for details.].
+This is what we are doing here - once the graph is ran, the `ActorRef` we get as the return result serves as our "messenger" between our libgdx code and the
+Akka Streams graph.
+====
 
 We're going to investigate both to see whether they help us solve our problem, but first, let's...
 
@@ -119,15 +134,6 @@ class MainScreen extends ScreenAdapter {
 
 The concept is straightforward: we're using a http://doc.akka.io/docs/akka/current/scala/stream/stream-composition.html#materialized-values[materialized value^] (an `ActorRef`) to ping the source
 with a tick delta time every time a tick occurs.
-
-[NOTE]
-====
-What's important to be aware here is that, in Akka Streams, the value materialized from running footnote:[*also* confusingly called "materializing"....]
-a graph is not only used to get some output out of it, but can also be used to
-provide input _into_ it. This is what we are doing here - once the graph is ran,
-the `ActorRef` we get as the result serves as our "messenger" between our libgdx code and the
-Akka Stream graph.
-====
 
 You can play around with the source code for this stage {githubprefix}/8a386d516535df51be8ff3920f09c743d334df21[here^].
 
